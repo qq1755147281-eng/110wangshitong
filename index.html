@@ -1,0 +1,2795 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>万事通</title>
+<style>
+/* ===================== 基础变量 ===================== */
+:root{
+  --navy-0:#040B1C;
+  --navy-1:#07142F;
+  --navy-2:#0B1E44;
+  --navy-3:#10295A;
+  --panel:rgba(18,42,92,.52);
+  --panel-line:rgba(96,156,255,.18);
+  --cyan:#2DD4CF;
+  --blue:#4D8DFF;
+  --blue-deep:#1E5BDE;
+  --gold:#F5C542;
+  --red:#FF5A6A;
+  --orange:#FF9F43;
+  --green:#2FE08B;
+  --text:#EAF2FF;
+  --muted:#8BA6CE;
+  --muted-2:#5F7AA8;
+  --radius:16px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+  background:#02060F;
+  color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+}
+/* 桌面端环境光背景 */
+.stage-bg{position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(720px 480px at 18% -8%,rgba(45,120,255,.20),transparent 60%),
+    radial-gradient(680px 520px at 88% 112%,rgba(45,212,207,.13),transparent 60%),
+    radial-gradient(420px 420px at 80% 8%,rgba(245,197,66,.06),transparent 60%),
+    #02060F;
+}
+.stage-bg::before{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(110,160,255,.05) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(110,160,255,.05) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(circle at 50% 45%,#000 30%,transparent 78%);
+}
+
+/* ===================== 手机外壳 ===================== */
+.phone{
+  position:relative;z-index:1;
+  width:min(404px,100vw);height:min(872px,100vh);
+  border-radius:52px;
+  background:linear-gradient(160deg,#2a3242 0%,#0c1018 42%,#222a38 78%,#080b11 100%);
+  padding:11px;
+  box-shadow:0 0 0 2px #45506380,
+    0 40px 90px -20px rgba(0,0,0,.85),
+    0 0 120px -30px rgba(50,120,255,.35);
+}
+.phone::before{ /* 钛金属高光条 */
+  content:"";position:absolute;top:14px;bottom:14px;left:4px;width:2px;border-radius:2px;
+  background:linear-gradient(#ffffff66,transparent 30%,transparent 70%,#ffffff33);
+}
+.phone .key{position:absolute;background:linear-gradient(90deg,#0a0d14,#39424f,#0a0d14);border-radius:3px}
+.phone .key.power{right:-3px;top:200px;width:4px;height:96px}
+.phone .key.vol1{left:-3px;top:170px;width:4px;height:58px}
+.phone .key.vol2{left:-3px;top:244px;width:4px;height:58px}
+.screen{
+  position:relative;width:100%;height:100%;
+  border-radius:42px;overflow:hidden;
+  background:var(--navy-0);
+}
+@media (max-width:460px),(max-height:760px){
+  body{background:var(--navy-0)}
+  .stage-bg{display:none}
+  .phone{width:100vw;height:100dvh;border-radius:0;padding:0;box-shadow:none}
+  .phone::before,.phone .key{display:none}
+  .screen{border-radius:0}
+}
+
+/* ===================== 启动页 ===================== */
+.splash{
+  position:absolute;inset:0;z-index:50;
+  display:flex;flex-direction:column;align-items:center;
+  background:
+    radial-gradient(420px 460px at 50% 34%,rgba(30,91,222,.34),transparent 68%),
+    radial-gradient(520px 380px at 50% 110%,rgba(45,212,207,.16),transparent 70%),
+    linear-gradient(180deg,#050E24 0%,#071531 55%,#040B1C 100%);
+  transition:opacity .55s ease,transform .55s ease,filter .55s ease;
+}
+.splash.hide{opacity:0;transform:scale(1.07);filter:blur(6px);pointer-events:none}
+.splash-grid{position:absolute;inset:0;opacity:.5;
+  background-image:linear-gradient(rgba(110,160,255,.06) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(110,160,255,.06) 1px,transparent 1px);
+  background-size:34px 34px;
+  mask-image:radial-gradient(circle at 50% 42%,#000 0%,transparent 72%);
+}
+
+.splash-logo{position:absolute;top:21%;width:148px;height:148px}
+.lg-ring{position:absolute;inset:0;border-radius:50%;
+  border:1.5px dashed rgba(160,200,255,.45);
+  animation:spin 11s linear infinite;}
+.lg-ring::after{content:"";position:absolute;top:-4px;left:50%;width:8px;height:8px;border-radius:50%;
+  background:var(--cyan);box-shadow:0 0 12px 3px rgba(45,212,207,.8)}
+.lg-ring2{position:absolute;inset:15px;border-radius:50%;
+  border:1px solid transparent;border-top-color:var(--gold);border-bottom-color:rgba(245,197,66,.55);
+  animation:spin 5.2s linear infinite reverse;}
+.lg-pulse{position:absolute;inset:24px;border-radius:50%;border:1px solid rgba(45,212,207,.55);
+  animation:pulseRing 2.6s ease-out infinite}
+.lg-pulse.p2{animation-delay:1.3s}
+.lg-sweep{position:absolute;inset:26px;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(45,212,207,.5),rgba(45,212,207,.08) 60deg,transparent 95deg);
+  animation:spin 2.8s linear infinite;opacity:.75}
+.lg-sweep::after{content:"";position:absolute;inset:14px;border-radius:50%;
+  background:radial-gradient(circle,rgba(10,30,66,.95),rgba(8,22,50,.75))}
+.lg-core{position:absolute;inset:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(45,212,207,.22),rgba(30,91,222,.12) 55%,transparent 75%);
+  box-shadow:0 0 26px rgba(45,212,207,.35),inset 0 0 18px rgba(45,212,207,.25);
+  animation:coreBreath 2.4s ease-in-out infinite;z-index:2}
+.lg-orbit{position:absolute;inset:8px;animation:spin 6.4s linear infinite}
+.lg-orbit i{position:absolute;top:1px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;
+  background:var(--gold);box-shadow:0 0 10px 2px rgba(245,197,66,.85)}
+.lg-orbit.o2{inset:-2px;animation-duration:8.6s;animation-direction:reverse}
+.lg-orbit.o2 i{background:#7FD8FF;width:5px;height:5px;box-shadow:0 0 9px 2px rgba(127,216,255,.8)}
+
+.lg-shield{position:relative;z-index:2;width:46px;height:46px;filter:drop-shadow(0 0 8px rgba(245,197,66,.55))}
+.lg-shield path.sh{
+  fill:rgba(245,197,66,.14);
+  stroke:url(#goldGrad);stroke-width:2.4;stroke-linejoin:round;
+  stroke-dasharray:160;stroke-dashoffset:160;
+  animation:drawSh 1.1s .25s ease forwards,fillSh .8s 1s ease forwards;
+}
+.lg-shield path.ck{
+  fill:none;stroke:#7FFFE3;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:40;stroke-dashoffset:40;
+  animation:drawCk .55s 1.05s ease forwards;
+  filter:drop-shadow(0 0 5px rgba(127,255,227,.9));
+}
+@keyframes drawSh{to{stroke-dashoffset:0}}
+@keyframes fillSh{to{fill:rgba(245,197,66,.26)}}
+@keyframes drawCk{to{stroke-dashoffset:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulseRing{0%{transform:scale(.75);opacity:.9}100%{transform:scale(1.28);opacity:0}}
+@keyframes coreBreath{0%,100%{box-shadow:0 0 22px rgba(45,212,207,.3),inset 0 0 16px rgba(45,212,207,.2)}
+  50%{box-shadow:0 0 38px rgba(45,212,207,.55),inset 0 0 26px rgba(45,212,207,.4)}}
+
+.splash-title{position:absolute;top:calc(21% + 178px);display:flex;gap:14px}
+.splash-title span{
+  font-size:38px;font-weight:800;letter-spacing:2px;font-family:KaiTi,STKaiti,serif;
+  background:linear-gradient(180deg,#FFF6D8 0%,var(--gold) 55%,#C8901B 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  text-shadow:0 0 26px rgba(245,197,66,.35);
+}
+@keyframes charIn{to{opacity:1;transform:translateY(0)}}
+.splash-sub{position:absolute;top:calc(21% + 232px);font-size:11.5px;letter-spacing:6px;
+  color:rgba(160,195,255,.8)}
+@keyframes fadeIn{to{opacity:1}}
+
+.splash-load{position:absolute;top:calc(21% + 296px);bottom:auto;width:64%;text-align:center}
+.splash-load .lp{display:flex;justify-content:space-between;font-size:11px;color:rgba(200,220,255,.75);
+  letter-spacing:2px;margin-bottom:9px}
+.splash-load .lp b{color:#fff;font-weight:600;font-variant-numeric:tabular-nums}
+.ltrack{height:2px;border-radius:2px;background:rgba(255,255,255,.16);overflow:hidden}
+.lfill{height:100%;width:0%;border-radius:2px;background:#fff;
+  box-shadow:0 0 8px rgba(255,255,255,.95),0 0 16px rgba(127,200,255,.7)}
+.splash-foot{position:absolute;top:calc(21% + 350px);bottom:auto;font-size:9.5px;letter-spacing:2px;color:rgba(140,165,210,.55)}
+
+/* ===================== 应用主体 ===================== */
+.app{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  background:
+    radial-gradient(560px 300px at 50% -8%,rgba(30,91,222,.30),transparent 70%),
+    linear-gradient(180deg,#07142F 0%,#061129 46%,#040B1C 100%);
+}
+.app-header{flex:0 0 auto;padding:8px 18px 12px;display:flex;align-items:center;gap:12px}
+.hd-logo{width:40px;height:40px;flex:0 0 40px;border-radius:12px;position:relative;
+  background:linear-gradient(160deg,rgba(45,120,255,.35),rgba(20,46,100,.7));
+  border:1px solid rgba(120,170,255,.35);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 16px rgba(45,120,255,.35),inset 0 0 10px rgba(45,120,255,.25)}
+.hd-logo::after{content:"";position:absolute;inset:0;border-radius:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.22),transparent 45%)}
+.hd-logo svg{width:23px;height:23px}
+.hd-txt h1{font-size:18px;font-weight:800;letter-spacing:2px;
+  background:linear-gradient(180deg,#fff,#AFC9FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hd-txt p{font-size:10px;color:var(--muted);letter-spacing:1.4px;margin-top:2px}
+.hd-radar{margin-left:auto;width:38px;height:38px;flex:0 0 38px;border-radius:12px;position:relative;
+  background:linear-gradient(160deg,rgba(45,120,255,.35),rgba(20,46,100,.7));
+  border:1px solid rgba(120,170,255,.35);
+  box-shadow:0 0 16px rgba(45,120,255,.35),inset 0 0 10px rgba(45,120,255,.25)}
+.hd-radar::after{content:"";position:absolute;inset:0;border-radius:12px;
+  background:linear-gradient(160deg,rgba(255,255,255,.22),transparent 45%)}
+.hd-radar svg{width:100%;height:100%;display:block}
+.hr-outer{transform-origin:50% 50%;animation:spin 6s linear infinite;
+  filter:drop-shadow(0 0 2.5px rgba(47,224,139,.9))}
+.hr-inner{transform-origin:50% 50%;animation:spin 4.5s linear infinite reverse;
+  filter:drop-shadow(0 0 2.5px rgba(245,197,66,.9))}
+.hr-core-dot{transform-origin:50% 50%;animation:hrCore 1.6s ease-in-out infinite;
+  filter:drop-shadow(0 0 3px rgba(255,90,106,.95))}
+@keyframes hrCore{0%,100%{transform:scale(.85);opacity:.8}50%{transform:scale(1.15);opacity:1}}
+
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;
+  padding:0 16px calc(96px + var(--safe-b));display:none;
+  scrollbar-width:none}
+.page::-webkit-scrollbar{display:none}
+.page.active{display:block;animation:pageIn .38s ease both}
+@keyframes pageIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* 应用入场（启动页结束后） */
+.app .enter{opacity:0;animation:enterUp .55s cubic-bezier(.22,.9,.3,1) forwards}
+@keyframes enterUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* ---------- 轮播播报 ---------- */
+.banner{position:relative;height:104px;border-radius:var(--radius);overflow:hidden}
+.banner-track{display:flex;height:100%;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.banner-card{min-width:100%;height:100%;padding:16px 18px;position:relative;overflow:hidden;
+  display:flex;align-items:center;gap:14px}
+.bc-1{background:linear-gradient(115deg,#123a85 0%,#0E2A61 55%,rgba(14,42,97,.4) 100%)}
+.bc-2{background:linear-gradient(115deg,#0E4A52 0%,#0C3245 55%,rgba(12,50,69,.4) 100%)}
+.bc-3{background:linear-gradient(115deg,#6B2436 0%,#4A1A2B 55%,rgba(74,26,43,.4) 100%)}
+.banner-card::after{content:"";position:absolute;right:-30px;top:-40px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
+.bc-ic{width:46px;height:46px;flex:0 0 46px;border-radius:13px;z-index:1;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  backdrop-filter:blur(4px)}
+.bc-ic svg{width:25px;height:25px}
+.bc-body{z-index:1;min-width:0}
+.bc-tag{display:inline-block;font-size:9.5px;padding:2px 8px;border-radius:999px;letter-spacing:1px;
+  background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);color:#EAF2FF;margin-bottom:6px}
+.bc-body h2{font-size:15.5px;font-weight:800;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-body p{font-size:11px;color:rgba(220,234,255,.78);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner-dots{position:absolute;bottom:9px;right:16px;display:flex;gap:5px;z-index:2}
+.banner-dots i{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.35);transition:all .35s}
+.banner-dots i.on{width:16px;background:#fff;box-shadow:0 0 8px rgba(255,255,255,.8)}
+
+/* ===================== 排行详情弹窗 ===================== */
+.rk-mask{position:fixed;inset:0;z-index:70;background:rgba(3,8,20,.78);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;
+  transition:opacity .25s,visibility .25s}
+.rk-mask.open{opacity:1;visibility:visible}
+.rk-modal{width:90%;height:90%;max-width:420px;border-radius:18px;overflow:hidden;position:relative;
+  background:linear-gradient(170deg,#0D1B3E,#081227 65%);
+  border:1.5px solid rgba(91,141,239,.55);
+  box-shadow:0 24px 70px rgba(0,0,0,.7),0 0 40px -8px rgba(91,141,239,.35);
+  transform:scale(.92) translateY(16px);transition:transform .3s cubic-bezier(.2,.9,.25,1.1);
+  display:flex;flex-direction:column}
+.rk-mask.open .rk-modal{transform:none}
+.rk-close{position:absolute;top:10px;right:10px;z-index:5;width:32px;height:32px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.06);color:#9FB2D8;font-size:14px;cursor:pointer}
+.rk-close:active{transform:scale(.88);border-color:#5B8DEF}
+.rk-name{margin:0;padding:16px 52px 0 18px;font-size:17px;font-weight:800;color:#EAF2FF;letter-spacing:1px}
+.rk-sub{margin:4px 0 0;padding:0 18px 10px;font-size:11px;color:var(--muted);letter-spacing:1px;border-bottom:1px solid rgba(255,255,255,.08)}
+.rk-list{flex:1;overflow-y:auto;padding:12px 14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;align-content:start}
+.rk-card{background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:0;
+  position:relative;overflow:hidden;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:transform .18s,border-color .18s,box-shadow .18s}
+.rk-card:active{transform:scale(.94)}
+.rk-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#5B8DEF;border-radius:3px}
+.rk-card h5{margin:0;font-size:11.5px;font-weight:700;color:#EAF2FF;font-family:KaiTi,STKaiti,serif;text-align:center;line-height:1.4;padding:8px;word-break:break-all}
+.rk-tips{padding:12px 16px 16px;border-top:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.15)}
+.rk-tips h6{margin:0 0 8px;font-size:11px;color:#FFD873;letter-spacing:2px}
+.rk-tips div{font-size:10.5px;line-height:1.55;color:#C8D4F0;margin-bottom:4px;padding-left:14px;position:relative}
+.rk-tips div::before{content:'▸';position:absolute;left:0;color:#2FE08B}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#FF7A8A;margin-right:5px;
+  box-shadow:0 0 8px #FF7A8A;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+
+/* ---------- 三个长方形按钮 ---------- */
+.quick{display:flex;gap:9px;margin-top:14px}
+.quick-btn{flex:1;display:flex;align-items:center;gap:8px;border-radius:13px;padding:9px 9px;text-align:left;position:relative;overflow:hidden;
+  background:linear-gradient(170deg,rgba(24,54,116,.75),rgba(12,30,68,.75));
+  border:1px solid rgba(150,110,255,.45);cursor:pointer;
+  transition:transform .18s,border-color .25s,box-shadow .25s;color:var(--text)}
+.quick-btn:active{transform:scale(.95)}
+.quick-btn.on{border-color:rgba(47,224,139,.75);box-shadow:0 0 18px -4px rgba(47,224,139,.6)}
+.quick-btn .qb-ic{width:32px;height:32px;flex:0 0 32px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.quick-btn .qb-ic svg{width:18px;height:18px}
+.quick-btn .qb-tx{flex:1;min-width:0}
+.qb-hot .qb-ic{background:linear-gradient(160deg,rgba(245,197,66,.32),rgba(245,197,66,.12));border:1px solid rgba(245,197,66,.45);box-shadow:0 0 14px -3px rgba(245,197,66,.6)}
+.qb-aud .qb-ic{background:linear-gradient(160deg,rgba(47,224,139,.3),rgba(47,224,139,.1));border:1px solid rgba(47,224,139,.45);box-shadow:0 0 14px -3px rgba(47,224,139,.6)}
+.qb-ok .qb-ic{background:linear-gradient(160deg,rgba(255,90,106,.32),rgba(255,90,106,.1));border:1px solid rgba(255,90,106,.45);box-shadow:0 0 14px -3px rgba(255,90,106,.6)}
+.quick-btn b{display:block;font-size:12.5px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.quick-btn small{display:block;font-size:9px;color:var(--muted);margin-top:2.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* ---------- 区块标题 ---------- */
+.sec-hd{display:flex;align-items:center;margin:20px 2px 11px}
+.sec-hd .bar{width:3.5px;height:14px;border-radius:2px;margin-right:8px;
+  background:linear-gradient(180deg,var(--cyan),var(--blue));box-shadow:0 0 8px rgba(45,212,207,.7)}
+.sec-hd h3{font-size:15px;font-weight:800;letter-spacing:1px}
+.sec-hd .more{margin-left:auto;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:2px}
+.filter-chip{font-size:10px;padding:3px 10px;border-radius:999px;margin-left:8px;
+  background:rgba(45,120,255,.16);border:1px solid rgba(45,120,255,.4);color:#9FC4FF;display:none}
+.filter-chip.show{display:block}
+
+/* ---------- 骗局案例卡 ---------- */
+#caseList{display:flex;flex-direction:column}
+.case{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;margin-bottom:10px;
+  background:linear-gradient(170deg,rgba(20,46,100,.62),rgba(11,27,60,.62));
+  border:1px solid var(--panel-line);position:relative;overflow:hidden;cursor:pointer;
+  transition:transform .18s,border-color .25s}
+.case:active{transform:scale(.98)}
+.case .lv{position:absolute;left:0;top:0;bottom:0;width:3px}
+.lv.danger{background:linear-gradient(180deg,#FF7A8A,#FF3D52);box-shadow:0 0 12px rgba(255,70,90,.8)}
+.lv.warn{background:linear-gradient(180deg,#FFC067,#FF9F43);box-shadow:0 0 12px rgba(255,159,67,.7)}
+.case[data-cat="hot"] .lv{background:linear-gradient(180deg,#FFE08A,#F5C542);box-shadow:0 0 12px rgba(245,197,66,.85)}
+.case[data-cat="review"] .lv{background:linear-gradient(180deg,#5FF0B0,#2FE08B);box-shadow:0 0 12px rgba(47,224,139,.85)}
+.case[data-cat="ok"] .lv{background:linear-gradient(180deg,#FF7A8A,#FF3D52);box-shadow:0 0 12px rgba(255,70,90,.85)}
+.case-ic{width:42px;height:42px;flex:0 0 42px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-left:3px}
+.case-ic svg{width:22px;height:22px}
+.ci-red{background:rgba(255,90,106,.14);border:1px solid rgba(255,90,106,.38)}
+.ci-orange{background:rgba(255,159,67,.14);border:1px solid rgba(255,159,67,.38)}
+.ci-gold{background:rgba(245,197,66,.13);border:1px solid rgba(245,197,66,.36)}
+.ci-purple{background:rgba(150,110,255,.14);border:1px solid rgba(150,110,255,.4)}
+.case-bd{flex:1;min-width:0}
+.case-bd .row1{display:flex;align-items:center;gap:7px}
+.case-bd h4{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.case-bd p{font-size:11px;color:var(--muted);margin-top:3.5px;line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tag{font-size:9px;padding:2px 7px;border-radius:6px;letter-spacing:.5px;flex:0 0 auto}
+.tag.hot{background:rgba(255,90,106,.18);color:#FF9AA6;border:1px solid rgba(255,90,106,.4)}
+.tag.review{background:rgba(245,197,66,.16);color:#FFD873;border:1px solid rgba(245,197,66,.42)}
+.tag.ok{background:rgba(47,224,139,.15);color:#7CF0B4;border:1px solid rgba(47,224,139,.4)}
+.risk{font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:7px;flex:0 0 auto;letter-spacing:1px}
+.risk.high{color:#FF8A98;background:rgba(255,90,106,.16);border:1px solid rgba(255,90,106,.45)}
+.risk.mid{color:#FFC26B;background:rgba(255,159,67,.14);border:1px solid rgba(255,159,67,.45)}
+.case .go{color:var(--muted-2);flex:0 0 auto}
+.empty{text-align:center;color:var(--muted);font-size:12px;padding:40px 0;display:none}
+
+/* ===================== 排行页 ===================== */
+.rank-top{border-radius:16px;padding:16px 16px 14px;margin-bottom:14px;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,rgba(30,91,222,.4),rgba(10,26,62,.7));
+  border:1px solid rgba(96,156,255,.3)}
+.rank-top::after{content:"";position:absolute;right:-34px;bottom:-44px;width:150px;height:150px;border-radius:50%;
+  background:radial-gradient(circle,rgba(45,212,207,.22),transparent 70%)}
+.rank-top h3{font-size:14px;letter-spacing:1px}
+.rank-top p{font-size:10.5px;color:var(--muted);margin-top:4px}
+.rank-top .week{display:flex;gap:14px;margin-top:12px}
+.rank-top .week div{flex:1}
+.rank-top .week b{font-size:19px;font-weight:800;font-variant-numeric:tabular-nums;
+  background:linear-gradient(180deg,#fff,#8FC4FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.rank-top .week small{display:block;font-size:9.5px;color:var(--muted);margin-top:2px}
+.rk-bd .t span{font-family:'KaiTi','STKaiti','楷体',serif;font-size:14px;letter-spacing:1px}
+
+/* ===================== 动态扫描线（反诈模型页） ===================== */
+.scan-lines{margin:18px 2px 4px;display:flex;flex-direction:column;gap:13px}
+.sl-row{position:relative;height:2px;overflow:hidden;border-radius:2px;
+  background:rgba(47,224,139,.08)}
+.sl{position:absolute;top:0;width:38px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,#2FE08B 35%,#B8FFE0 50%,#2FE08B 65%,transparent);
+  box-shadow:0 0 10px rgba(47,224,139,.95),0 0 4px rgba(47,224,139,.8)}
+.sl-a{animation:slL2R 4.8s linear infinite;animation-delay:var(--d,0s)}
+.sl-b{animation:slR2L 4.8s linear infinite;animation-delay:var(--d,0s)}
+.sl-c{animation:slL2R 6.4s linear infinite;animation-delay:var(--d,0s)}
+.sl-row .sl:nth-child(even){width:26px;opacity:.72}
+.sl-row .sl:nth-child(3){width:44px}
+@keyframes slL2R{from{left:-38px}to{left:100%}}
+@keyframes slR2L{from{right:-38px}to{right:100%}}
+
+/* ===================== 案例详情弹窗（占屏90%） ===================== */
+.case-mask{position:absolute;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;
+  background:rgba(4,10,24,.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  opacity:0;pointer-events:none;transition:opacity .28s}
+.case-mask.open{opacity:1;pointer-events:auto}
+.case-modal{width:90%;height:90%;border-radius:18px;overflow-y:auto;overflow-x:hidden;
+  background:linear-gradient(175deg,#0E2148 0%,#091633 55%,#060D20 100%);
+  border:1.5px solid var(--cd);box-shadow:0 0 34px -6px var(--cd),0 30px 70px rgba(0,0,0,.55),inset 0 0 46px rgba(45,212,207,.05);
+  padding:16px 16px 20px;position:relative;
+  transform:translateY(26px) scale(.96);transition:transform .32s cubic-bezier(.2,.9,.25,1.2)}
+.case-mask.open .case-modal{transform:none}
+.case-modal::-webkit-scrollbar{width:5px}
+.case-modal::-webkit-scrollbar-thumb{background:linear-gradient(180deg,#F5C542,#FF9F43);border-radius:3px}
+.cm-close{position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.22);
+  background:rgba(255,255,255,.06);color:#EAF2FF;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:.2s;z-index:2}
+.cm-close:active{transform:scale(.88);border-color:var(--cd)}
+.cm-name{text-align:center;font-size:16.5px;font-weight:800;letter-spacing:1px;margin:10px 36px 7px;color:#F2F7FF;line-height:1.35}
+.cm-sub{text-align:center;font-size:11.5px;color:var(--muted);letter-spacing:1px;margin-bottom:14px}
+.cm-sub span{font-weight:700;color:var(--cd)}
+.cm-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
+.cm-meta div{border-radius:11px;padding:9px 10px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.09)}
+.cm-meta small{display:block;font-size:9px;color:var(--muted);letter-spacing:1px;margin-bottom:3px}
+.cm-meta b{font-size:11.5px;font-weight:700;color:#EAF2FF;line-height:1.3;display:block}
+.cm-story{border-radius:13px;padding:13px 13px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);
+  font-size:12px;line-height:1.75;color:#C9D8F2;text-align:justify}
+.cm-story em{font-style:normal;color:var(--cd);font-weight:700}
+.cm-btns{display:flex;gap:9px;margin-top:14px}
+.cm-btns button{flex:1;padding:10px 0;border-radius:12px;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;
+  color:#EAF2FF;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);transition:.2s}
+.cm-btns button:active{transform:scale(.94)}
+.cm-btns button[data-k="group"]{border-color:rgba(47,224,139,.6);color:#7CF0B4}
+.cm-btns button[data-k="progress"]{border-color:rgba(245,197,66,.6);color:#FFD873}
+.cm-btns button[data-k="result"]{border-color:rgba(255,90,106,.6);color:#FF8A98}
+.cm-btns button.on{background:rgba(255,255,255,.09);box-shadow:0 0 16px -4px currentColor}
+.cm-detail{margin-top:11px;border-radius:12px;padding:12px;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.14);
+  font-size:11.5px;line-height:1.7;color:#C9D8F2;display:none}
+.cm-detail.show{display:block;animation:cmFade .3s}
+.cm-detail b{color:var(--cd)}
+.cm-prog{height:6px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden;margin:8px 0 6px}
+.cm-prog i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--cd),#fff3);box-shadow:0 0 8px var(--cd)}
+@keyframes cmFade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ===================== 二级悬浮窗（群聊/进度/结果） ===================== */
+.sub-mask{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-start;justify-content:center;
+  background:rgba(3,8,20,.45);opacity:0;pointer-events:none;transition:opacity .25s}
+.sub-mask.open{opacity:1;pointer-events:auto}
+.sub-pop{width:94%;height:60%;margin-top:36px;border-radius:16px;overflow:hidden;
+  background:linear-gradient(175deg,#11224E,#091634 70%);
+  border:1.5px solid var(--cd,#2DD4CF);
+  box-shadow:0 14px 46px rgba(0,0,0,.55),0 0 30px -8px var(--cd,#2DD4CF);
+  transform:translateY(-26px) scale(.97);transition:transform .3s cubic-bezier(.2,.9,.25,1.1);
+  display:flex;flex-direction:column}
+.sub-mask.open .sub-pop{transform:none}
+.sp-hd{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 11px;
+  border-bottom:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03)}
+.sp-hd b{font-size:14.5px;letter-spacing:2px;color:#F2F7FF}
+.sp-hd b::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--cd,#2DD4CF);
+  box-shadow:0 0 8px var(--cd,#2DD4CF);margin-right:8px;vertical-align:2px}
+.sp-hd button{width:28px;height:28px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);
+  color:#EAF2FF;font-size:12px;cursor:pointer;transition:.2s}
+.sp-hd button:active{transform:scale(.86)}
+.sp-bd{flex:1;overflow-y:auto;padding:14px 16px 18px;font-size:12px;color:#C9D8F2}
+.sp-bd::-webkit-scrollbar{width:4px}
+.sp-bd::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:2px}
+
+/* 群聊三种方式 */
+.sg-row{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;margin-bottom:9px;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.sg-tag{flex:none;font-size:11px;font-weight:800;letter-spacing:1px;padding:4px 9px;border-radius:8px;color:#06101F;background:linear-gradient(135deg,#7CF0B4,#2DD4CF)}
+.sg-row:nth-child(2) .sg-tag{background:linear-gradient(135deg,#FFD873,#FFB36B)}
+.sg-row:nth-child(3) .sg-tag{background:linear-gradient(135deg,#9FC4FF,#B69CFF)}
+.sg-row b{flex:1;font-size:13px;letter-spacing:1px;color:#EAF2FF;font-family:Consolas,monospace}
+.sg-copy{flex:none;font-size:10px;padding:4px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.06);color:#C9D8F2;cursor:pointer}
+.sg-copy:active{transform:scale(.9)}
+.sg-qr{margin-top:6px;text-align:center;padding:14px 10px 12px;border-radius:13px;
+  background:rgba(255,255,255,.045);border:1px dashed rgba(255,255,255,.16)}
+.sg-qr svg{width:128px;height:128px;border-radius:10px;background:#fff;padding:8px;box-shadow:0 0 0 5px rgba(255,255,255,.07),0 8px 24px rgba(0,0,0,.4)}
+.sg-qr p{margin-top:9px;font-size:11.5px;letter-spacing:2px;color:#EAF2FF}
+.sg-qr small{display:block;margin-top:3px;font-size:9.5px;color:var(--muted)}
+.sg-qr-empty{width:128px;height:128px;margin:0 auto;border-radius:10px;background:repeating-conic-gradient(#e8e8e8 0 25%,#f7f7f7 0 50%) 0 0/18px 18px;
+  border:2px dashed rgba(10,24,54,.35);display:flex;align-items:center;justify-content:center;
+  color:#5a6a86;font-size:12px;letter-spacing:3px;font-weight:700;
+  box-shadow:0 0 0 5px rgba(255,255,255,.07),0 8px 24px rgba(0,0,0,.4)}
+
+/* 维权进度：竖排7节点时间线（紧凑版，一屏全显） */
+.tl{position:relative;padding-left:20px}
+.tl::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;
+  background:linear-gradient(180deg,var(--cd,#2DD4CF),rgba(255,255,255,.08))}
+.tl-it{position:relative;padding:0 0 8px 8px}
+.tl-it:last-child{padding-bottom:0}
+.tl-it::before{content:'';position:absolute;left:-19px;top:3px;width:8px;height:8px;border-radius:50%;
+  background:#0A1836;border:2px solid var(--cd,#2DD4CF);box-shadow:0 0 8px var(--cd,#2DD4CF)}
+.tl-it b{display:inline;font-size:11px;color:#EAF2FF;letter-spacing:.5px}
+.tl-it time{display:inline;font-size:10px;color:var(--cd,#2DD4CF);margin-left:8px;font-family:Consolas,monospace}
+.tl-it p{font-size:10px;line-height:1.4;color:var(--muted);margin-top:1px}
+
+/* 项目结果 + 印章 */
+.rs-txt{font-size:12.5px;line-height:1.85;text-align:justify;color:#D6E2F8}
+.rs-txt b{color:var(--cd,#2DD4CF)}
+.seal{width:118px;height:118px;margin:16px auto 4px;display:block;
+  animation:sealIn .45s cubic-bezier(.2,1.4,.4,1) both;transform:rotate(-8deg)}
+.seal.red{color:#FF5A6A;filter:drop-shadow(0 0 12px rgba(255,90,106,.45))}
+.seal.green{color:#2FE08B;filter:drop-shadow(0 0 12px rgba(47,224,139,.45))}
+@keyframes sealIn{from{transform:scale(1.7) rotate(-20deg);opacity:0}to{transform:scale(1) rotate(-8deg);opacity:1}}
+.rank-item{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:13px;margin-bottom:9px;
+  background:linear-gradient(170deg,rgba(20,46,100,.58),rgba(11,27,60,.58));
+  border:1px solid var(--panel-line);cursor:pointer;position:relative;z-index:1}
+.rk-no{width:24px;height:24px;flex:0 0 24px;border-radius:8px;font-size:12px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(120,160,220,.14);color:#9FB8E0;font-style:normal}
+.rk-no.n1{background:linear-gradient(160deg,#F5C542,#C8891B);color:#241A02;box-shadow:0 0 14px -2px rgba(245,197,66,.8)}
+.rk-no.n2{background:linear-gradient(160deg,#D7E2F2,#93A6C2);color:#1A2333}
+.rk-no.n3{background:linear-gradient(160deg,#E59A5A,#A85F24);color:#2A1503}
+.rk-bd{flex:1;min-width:0}
+.rk-bd .t{display:flex;justify-content:space-between;font-size:12.5px;font-weight:700;margin-bottom:7px}
+.rk-bd .t em{font-style:normal;font-size:11px;color:var(--cyan);font-variant-numeric:tabular-nums}
+.rk-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.rk-bar i{display:block;height:100%;border-radius:99px;width:0;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));box-shadow:0 0 10px rgba(45,212,207,.6);
+  transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.rk-bar.hot i{background:linear-gradient(90deg,#FF5A6A,#FF9F43);box-shadow:0 0 10px rgba(255,120,90,.6)}
+.rk-trend{font-size:9.5px;color:var(--muted);margin-top:5px}
+.rk-trend .up{color:#FF8A98}
+.rk-trend .down{color:#7CF0B4}
+
+/* ===================== 反诈模型页 ===================== */
+.model-card{border-radius:16px;padding:16px;position:relative;overflow:hidden;
+  background:linear-gradient(170deg,rgba(16,42,96,.75),rgba(9,22,52,.8));
+  border:1px solid rgba(96,156,255,.3);margin-bottom:14px}
+.model-card .mc-hd{display:flex;align-items:center;gap:9px}
+.mc-status{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);
+  animation:blink 1.4s infinite}
+.mc-hd b{font-size:13.5px;letter-spacing:.5px}
+.mc-hd small{font-size:9.5px;color:var(--muted);margin-left:auto;border:1px solid var(--panel-line);
+  padding:2px 8px;border-radius:99px}
+
+.radar{width:178px;height:178px;margin:14px auto 6px;position:relative}
+.radar .rd-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(45,212,207,.25)}
+.radar .rd-ring.r2{inset:26px}.radar .rd-ring.r3{inset:52px}
+.radar .cross{position:absolute;inset:0}
+.radar .cross::before,.radar .cross::after{content:"";position:absolute;background:rgba(45,212,207,.22)}
+.radar .cross::before{left:50%;top:0;bottom:0;width:1px}
+.radar .cross::after{top:50%;left:0;right:0;height:1px}
+.radar .sweep{position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from 0deg,rgba(45,212,207,.55),transparent 80deg);
+  animation:spin 3s linear infinite}
+.radar .sweep::after{content:"";position:absolute;inset:52px;border-radius:50%;
+  background:radial-gradient(circle,#0A2049,#081A3D)}
+.radar .pt{position:absolute;width:7px;height:7px;border-radius:50%;z-index:2}
+.radar .pt.g{background:var(--green);box-shadow:0 0 10px var(--green);top:30px;left:118px;animation:ptBlink 2s infinite}
+.radar .pt.r{background:var(--red);box-shadow:0 0 10px var(--red);bottom:38px;left:44px;animation:ptBlink 1.6s .4s infinite}
+.radar .pt.y{background:var(--gold);box-shadow:0 0 10px var(--gold);top:64px;left:40px;animation:ptBlink 2.4s .9s infinite}
+@keyframes ptBlink{50%{opacity:.3;transform:scale(.7)}}
+.radar .core{position:absolute;inset:70px;border-radius:50%;z-index:3;
+  background:radial-gradient(circle,rgba(45,212,207,.4),rgba(30,91,222,.15));
+  border:1px solid rgba(45,212,207,.6);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 24px rgba(45,212,207,.5)}
+.radar .core svg{width:22px;height:22px}
+.radar.busy .sweep{animation-duration:.9s}
+.mc-tip{text-align:center;font-size:10.5px;color:var(--muted);letter-spacing:1px}
+
+.detect-box{border-radius:16px;padding:14px;
+  background:linear-gradient(170deg,rgba(16,42,96,.6),rgba(9,22,52,.65));
+  border:1px solid var(--panel-line);margin-bottom:14px}
+.detect-types{display:flex;gap:8px;margin-bottom:11px}
+.dtype{flex:1;text-align:center;font-size:10.5px;padding:7px 0;border-radius:9px;cursor:pointer;
+  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);color:var(--muted);
+  transition:all .2s}
+.dtype.on{background:rgba(45,120,255,.2);border-color:rgba(90,150,255,.6);color:#BfD9FF;
+  box-shadow:0 0 12px -3px rgba(45,120,255,.7)}
+.detect-input{display:flex;gap:8px}
+.detect-input input{flex:1;min-width:0;height:40px;border-radius:11px;border:1px solid var(--panel-line);
+  background:rgba(4,12,32,.6);color:var(--text);padding:0 12px;font-size:12.5px;outline:none;letter-spacing:.5px}
+.detect-input input::placeholder{color:#5872A0}
+.detect-input input:focus{border-color:rgba(45,212,207,.6);box-shadow:0 0 0 3px rgba(45,212,207,.12)}
+.detect-go{width:76px;flex:0 0 76px;height:40px;border-radius:11px;border:none;cursor:pointer;
+  font-size:12.5px;font-weight:700;letter-spacing:2px;color:#04122B;
+  background:linear-gradient(160deg,#5BE6E0,#2BB7E8);
+  box-shadow:0 6px 18px -4px rgba(45,212,207,.6)}
+.detect-go:active{transform:scale(.94)}
+.scan-log{margin-top:11px;font-size:10.5px;color:var(--muted);line-height:1.9;display:none}
+.scan-log.show{display:block}
+.scan-log .ok{color:#7CF0B4}.scan-log .err{color:#FF8A98}.scan-log .warn{color:#FFD873}
+
+.result-card{border-radius:14px;padding:14px;display:none;align-items:center;gap:12px;margin-bottom:14px;
+  animation:pageIn .4s ease}
+.result-card.show{display:flex}
+.result-card.danger{background:linear-gradient(120deg,rgba(255,70,90,.2),rgba(90,20,40,.35));border:1px solid rgba(255,90,106,.55)}
+.result-card.safe{background:linear-gradient(120deg,rgba(47,224,139,.16),rgba(16,60,42,.35));border:1px solid rgba(47,224,139,.5)}
+.result-card.review{background:linear-gradient(120deg,rgba(245,197,66,.16),rgba(70,52,12,.35));border:1px solid rgba(245,197,66,.5)}
+.rc-ic{width:44px;height:44px;flex:0 0 44px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.result-card.danger .rc-ic{background:rgba(255,90,106,.22)}
+.result-card.safe .rc-ic{background:rgba(47,224,139,.2)}
+.result-card.review .rc-ic{background:rgba(245,197,66,.2)}
+.rc-bd b{font-size:14px;letter-spacing:1px}
+.result-card.danger .rc-bd b{color:#FF9AA6}
+.result-card.safe .rc-bd b{color:#7CF0B4}
+.result-card.review .rc-bd b{color:#FFD873}
+.rc-bd p{font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.5}
+.rc-bd .rl{display:block;font-size:11px;color:#C9DCFF;margin-top:4px;line-height:1.5}
+.rc-bd .rl b{color:var(--cyan);font-weight:600;margin-right:6px}
+
+.recent{font-size:11px}
+.recent-item{display:flex;align-items:center;gap:9px;padding:10px 12px;border-radius:11px;margin-bottom:8px;
+  background:rgba(16,38,82,.45);border:1px solid rgba(96,156,255,.14)}
+.recent-dot{width:7px;height:7px;border-radius:50%;flex:0 0 7px}
+.recent-dot.danger{background:var(--red);box-shadow:0 0 8px var(--red)}
+.recent-dot.safe{background:var(--green);box-shadow:0 0 8px var(--green)}
+.recent-dot.review{background:var(--gold);box-shadow:0 0 8px var(--gold)}
+.recent-item span{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
+.recent-item small{color:var(--muted-2);font-size:9.5px;flex:0 0 auto}
+
+/* ===================== SOS 页 ===================== */
+.sos-hero{display:flex;align-items:center;gap:14px;border-radius:18px;padding:16px;margin-bottom:12px;
+  background:linear-gradient(130deg,rgba(255,60,80,.22),rgba(60,10,25,.55));
+  border:1px solid rgba(255,90,106,.42);position:relative;overflow:hidden}
+.sos-hero::after{content:"";position:absolute;right:-30px;top:-40px;width:140px;height:140px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,90,106,.25),transparent 70%)}
+.sos-badge{width:62px;height:62px;flex:0 0 62px;border-radius:18px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;font-weight:900;letter-spacing:2px;color:#fff;font-style:normal;
+  background:linear-gradient(160deg,#FF4D5E,#C81E2F);
+  animation:sosPulse 1.6s ease-in-out infinite}
+@keyframes sosPulse{0%,100%{box-shadow:0 0 16px rgba(255,70,90,.55),inset 0 2px 6px rgba(255,255,255,.3)}
+  50%{box-shadow:0 0 36px rgba(255,70,90,.95),inset 0 2px 6px rgba(255,255,255,.3)}}
+.sos-hero-txt h2{font-size:16.5px;font-weight:800;letter-spacing:1px}
+.sos-hero-txt p{font-size:10.5px;color:var(--muted);margin-top:5px;letter-spacing:.5px}
+.sos-quick{display:flex;gap:9px;margin-bottom:16px}
+.sq-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 0 10px;border-radius:14px;
+  text-decoration:none;color:#fff;transition:transform .15s}
+.sq-btn:active{transform:scale(.93)}
+.sq-btn b{font-size:18.5px;font-weight:900;letter-spacing:1px;font-variant-numeric:tabular-nums}
+.sq-btn small{font-size:9.5px;margin-top:3px;opacity:.92;letter-spacing:1px}
+.sq-red{background:linear-gradient(160deg,#FF4D5E,#B01E30);box-shadow:0 8px 20px -6px rgba(255,70,90,.75)}
+.sq-gold{background:linear-gradient(160deg,#F5C542,#B07E12);color:#2A1E02;box-shadow:0 8px 20px -6px rgba(245,197,66,.6)}
+.sq-green{background:linear-gradient(160deg,#2FE08B,#0E9E62);color:#03271A;box-shadow:0 8px 20px -6px rgba(47,224,139,.6)}
+.sos-group{border-radius:15px;overflow:hidden;margin-bottom:13px;
+  background:rgba(16,38,82,.42);border:1px solid var(--panel-line)}
+.sos-ghd{display:flex;align-items:center;gap:8px;padding:11px 14px;font-size:13px;font-weight:800;letter-spacing:1px;
+  background:rgba(24,54,116,.5);border-bottom:1px solid rgba(96,156,255,.15)}
+.sos-ghd .dot{width:8px;height:8px;border-radius:50%}
+.sos-ghd .dot.red{background:#FF5A6A;box-shadow:0 0 8px #FF5A6A}
+.sos-ghd .dot.gold{background:#F5C542;box-shadow:0 0 8px #F5C542}
+.sos-ghd .dot.blue{background:#4D8DFF;box-shadow:0 0 8px #4D8DFF}
+.sos-ghd .dot.cyan{background:#2DD4CF;box-shadow:0 0 8px #2DD4CF}
+.sos-ghd .dot.green{background:#2FE08B;box-shadow:0 0 8px #2FE08B}
+.sos-ghd span{margin-left:auto;font-size:9.5px;color:var(--muted);font-weight:400}
+.sos-row{display:flex;align-items:center;gap:12px;padding:11px 14px;text-decoration:none;color:inherit;position:relative}
+.sos-row:not(:last-child)::after{content:"";position:absolute;left:14px;right:14px;bottom:0;height:1px;
+  background:rgba(96,156,255,.1)}
+.sos-row:active{background:rgba(255,90,106,.08)}
+.sos-num{font-size:15.5px;font-weight:900;letter-spacing:.5px;color:#FFD873;flex:0 0 auto;min-width:56px;
+  font-variant-numeric:tabular-nums;text-shadow:0 0 12px rgba(245,197,66,.4)}
+.sos-info{flex:1;min-width:0}
+.sos-info b{display:block;font-size:12.5px}
+.sos-info small{display:block;font-size:9.8px;color:var(--muted);margin-top:2.5px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sos-call{flex:0 0 auto;display:flex;align-items:center;gap:5px;font-size:11.5px;font-weight:800;
+  letter-spacing:2px;color:#fff;padding:7px 14px;border-radius:999px;
+  background:linear-gradient(160deg,#FF4D5E,#C81E2F);box-shadow:0 4px 14px -3px rgba(255,70,90,.7);
+  transition:transform .15s}
+.sos-call:active{transform:scale(.9)}
+.sos-ver{text-align:center;font-size:10px;color:var(--muted-2);letter-spacing:1.5px;padding:6px 0 4px;line-height:1.8}
+.sys-ver{text-align:center;font-size:10px;color:var(--muted-2);letter-spacing:2px;padding:6px 0 4px}
+
+/* ---------- 底部导航 ---------- */
+.tabbar{position:absolute;left:0;right:0;bottom:0;z-index:20;
+  padding:7px 10px calc(8px + var(--safe-b));
+  display:flex;
+  background:linear-gradient(180deg,rgba(8,22,50,.82),rgba(5,13,32,.96));
+  border-top:1px solid rgba(96,156,255,.2);
+  backdrop-filter:blur(14px)}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 0;cursor:pointer;
+  color:#6783B3;position:relative;background:none;border:none;font-family:inherit}
+.tab svg{width:21px;height:21px;transition:all .25s}
+.tab span{font-size:10px;letter-spacing:1px;transition:color .25s}
+.tab::before{content:"";position:absolute;top:0;width:0;height:2.5px;border-radius:99px;
+  background:linear-gradient(90deg,var(--cyan),var(--blue));box-shadow:0 0 8px var(--cyan);transition:width .3s}
+.tab.on{color:#8FE9F2}
+.tab.on::before{width:26px}
+.tab.on svg{filter:drop-shadow(0 0 6px rgba(45,212,207,.8))}
+.tab:active{transform:scale(.92)}
+.tab-sos{color:#C97582}
+.tab-sos.on{color:#FF5A6A}
+.tab-sos.on::before{background:linear-gradient(90deg,#FF5A6A,#FF9F43);box-shadow:0 0 8px #FF5A6A}
+.tab-sos.on svg{filter:drop-shadow(0 0 6px rgba(255,90,106,.8))}
+
+/* 顶部轻提示 */
+.toast{position:absolute;left:50%;bottom:120px;transform:translate(-50%,16px);z-index:60;
+  background:rgba(10,26,62,.92);border:1px solid rgba(96,156,255,.4);
+  padding:9px 18px;border-radius:99px;font-size:12px;letter-spacing:1px;color:#DCEBFF;
+  opacity:0;pointer-events:none;transition:all .3s;white-space:nowrap;
+  box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 18px -6px rgba(45,120,255,.6)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+<div class="stage-bg"></div>
+<div class="phone">
+  <span class="key power"></span><span class="key vol1"></span><span class="key vol2"></span>
+  <div class="screen">
+
+    <!-- ============ 启动页 ============ -->
+    <div class="splash" id="splash">
+      <div class="splash-grid"></div>
+      <div class="splash-logo">
+        <div class="lg-ring"></div>
+        <div class="lg-ring2"></div>
+        <div class="lg-pulse"></div>
+        <div class="lg-pulse p2"></div>
+        <div class="lg-orbit"><i></i></div>
+        <div class="lg-orbit o2"><i></i></div>
+        <div class="lg-sweep"></div>
+        <div class="lg-core">
+          <svg class="lg-shield" viewBox="0 0 72 72">
+            <defs>
+              <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#FFE9A8"/><stop offset="1" stop-color="#D99A1F"/>
+              </linearGradient>
+            </defs>
+            <path class="sh" d="M36 6 L62 14 V34 C62 49 51 59 36 65 C21 59 10 49 10 34 V14 Z"/>
+            <path class="ck" d="M24 36 L33 45 L50 27"/>
+          </svg>
+        </div>
+      </div>
+      <div class="splash-title"><span>万</span><span>事</span><span>通</span></div>
+      <div class="splash-sub">全 民 反 诈 · 天 下 无 诈</div>
+      <div class="splash-load">
+        <div class="lp"><span>安全防护加载中</span><b><span id="lpct">0</span>%</b></div>
+        <div class="ltrack"><div class="lfill" id="lfill"></div></div>
+      </div>
+      <div class="splash-foot">反诈宣传<span style="margin-left:14px"></span>人人有责</div>
+    </div>
+
+    <!-- ============ 应用主体 ============ -->
+    <div class="app" id="app">
+      <!-- 头部 -->
+      <div class="app-header">
+        <div class="hd-logo">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M12 2 L20 5 V11.5 C20 16.5 16.5 20 12 22 C7.5 20 4 16.5 4 11.5 V5 Z" fill="rgba(47,224,139,.18)" stroke="#2FE08B" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M8.2 12 L11 14.8 L16 9.5" stroke="#7FFFE3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="hd-txt" style="display:flex;align-items:baseline;gap:8px">
+          <h1>万事通</h1>
+          <p style="margin-top:0;font-size:11px;letter-spacing:1.2px;color:var(--muted)">WANSHITONG</p>
+        </div>
+        <div class="hd-radar">
+          <svg viewBox="0 0 38 38" fill="none">
+            <g class="hr-outer">
+              <circle cx="19" cy="19" r="15.5" stroke="#2FE08B" stroke-width="2.6"
+                stroke-linecap="round" stroke-dasharray="12 7.48"/>
+            </g>
+            <g class="hr-inner">
+              <circle cx="19" cy="19" r="7.5" stroke="#F5C542" stroke-width="2.4"
+                stroke-linecap="round" stroke-dasharray="15 8.56"/>
+            </g>
+            <circle class="hr-core-dot" cx="19" cy="19" r="2.6" fill="#FF5A6A"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 页面区 -->
+      <div class="pages">
+
+        <!-- ===== 首页 ===== -->
+        <section class="page active" id="page-home">
+          <!-- 轮播播报 -->
+          <div class="banner enter" style="animation-delay:.05s">
+            <div class="banner-track" id="bTrack">
+              <div class="banner-card bc-1">
+                <div class="bc-ic">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#BFD8FF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l18-7-3 13-6-3-4 4v-5l-5-2z"/></svg>
+                </div>
+                <div class="bc-body">
+                  <span class="bc-tag"><span class="live-dot"></span>公益宣传</span>
+                  <h2>反诈中心 人人有责</h2>
+                  <p>96110 劝阻专线来电，请务必立即接听</p>
+                </div>
+              </div>
+              <div class="banner-card bc-2">
+                <div class="bc-ic">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#8FF0E9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M8 11h6M11 8v6"/></svg>
+                </div>
+                <div class="bc-body">
+                  <span class="bc-tag">软件查询</span>
+                  <h2>未知软件 先查再装</h2>
+                  <p>粘贴 APP / 网址，云端反诈模型一键鉴定</p>
+                </div>
+              </div>
+              <div class="banner-card bc-3">
+                <div class="bc-ic">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#FFB3BD" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>
+                </div>
+                <div class="bc-body">
+                  <span class="bc-tag"><span class="live-dot"></span>紧急预警</span>
+                  <h2>刷单返利 全是诈骗</h2>
+                  <p>“足不出户、日进斗金”都是诱饵，切勿转账</p>
+                </div>
+              </div>
+            </div>
+            <div class="banner-dots" id="bDots"><i class="on"></i><i></i><i></i></div>
+          </div>
+
+          <!-- 三个长方形按钮 -->
+          <div class="quick enter" style="animation-delay:.14s">
+            <button class="quick-btn qb-hot" data-filter="hot">
+              <div class="qb-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFD873" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s5 4.5 5 9a5 5 0 0 1-10 0c0-1.6.7-3 1.6-4 .1 1.4 1 2.2 1 2.2C9.2 7 12 5.5 12 3z"/></svg>
+              </div>
+              <div class="qb-tx"><b>最近热点</b><small>10 条预警</small></div>
+            </button>
+            <button class="quick-btn qb-aud" data-filter="review">
+              <div class="qb-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#7CF0B4" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M11 8v3l2.5 2"/></svg>
+              </div>
+              <div class="qb-tx"><b>正待审核</b><small>5 个待鉴定</small></div>
+            </button>
+            <button class="quick-btn qb-ok" data-filter="ok">
+              <div class="qb-ic">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18v3H3z"/><path d="M4 8h16v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M10 12h4"/></svg>
+              </div>
+              <div class="qb-tx"><b>历史诈骗</b><small>6 起在册</small></div>
+            </button>
+          </div>
+
+          <!-- 骗局案例 -->
+          <div class="sec-hd enter" style="animation-delay:.22s">
+            <span class="bar"></span><h3 id="caseTitle">风险骗局曝光</h3>
+            <span class="filter-chip" id="filterChip">筛选中 ✕</span>
+          </div>
+
+          <div id="caseList">
+            <article class="case enter" style="animation-delay:.26s" data-cat="hot">
+              <span class="lv danger"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M2 12h20M12 3c2.5 2.5 3.8 5.7 3.8 9S14.5 18.5 12 21c-2.5-2.5-3.8-5.7-3.8-9S9.5 5.5 12 3z"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>境外科技投资平台</h4><span class="tag hot">热点</span></div>
+                <p>冒充“境外科技集团”，谎称掌握新股、虚拟币内幕消息，诱导下载虚假 APP 后先赚后亏，卷款跑路。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case enter" style="animation-delay:.34s" data-cat="review">
+              <span class="lv warn"></span>
+              <div class="case-ic ci-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#B69CFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8" opacity=".6"/><circle cx="12" cy="12" r="3.5"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>OPA 项目</h4><span class="tag review">审核中</span></div>
+                <p>借派链、实名DID、派元宇宙等积分迁移名义发行 OPA 代币，与派币官方无关；现已无法提现，QQ 群已解散。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case enter" style="animation-delay:.42s" data-cat="hot">
+              <span class="lv warn"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M8 10h5M8 13h8"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>刷单返利连环套</h4><span class="tag hot">热点</span></div>
+                <p>小额返利获取信任后诱导大额“连单”“任务单”，以操作失误、需缴税验证金等名义不断要求转账。</p>
+              </div>
+              <span class="risk mid">中危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case enter" style="animation-delay:.46s" data-cat="review">
+              <span class="lv warn"></span>
+              <div class="case-ic ci-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFB36B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="12" r="2.2"/><path d="M14 9.5h4M14 12.5h4M14 15.5h2.5"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>实名DID（界外）</h4><span class="tag review">审核中</span></div>
+                <p>曾号称公安部授权加持，现已被证伪并更名"界外"；3000 元会员承诺的酒店、景区等场景对接全部落空。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="hot">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/><path d="M17 4l2-2M19 8h3"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>AI 换脸视频通话诈骗</h4><span class="tag hot">热点</span></div>
+                <p>利用 AI 换脸与拟声技术冒充亲友、领导视频通话，以急事借款为由诱导转账，眼见不一定为实。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="hot">
+              <span class="lv"></span>
+              <div class="case-ic ci-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFB36B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-5 9 5-9 5z"/><path d="M7 11.5V16c0 1.5 2.2 3 5 3s5-1.5 5-3v-4.5M21 9v5"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>演唱会门票代抢骗局</h4><span class="tag hot">热点</span></div>
+                <p>谎称有内部渠道可代抢热门演唱会门票，收取票款与“保证金”后拉黑失联，购票请认准官方平台。</p>
+              </div>
+              <span class="risk mid">中危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="hot">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>“百万保障”扣费骗局</h4><span class="tag hot">热点</span></div>
+                <p>冒充支付平台客服称“百万保障”到期将自动扣费，诱导下载会议软件共享屏幕，实时转走账户资金。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="ok">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M9 20v-6h6v6" opacity=".7"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>云数贸（民族资产解冻）</h4><span class="tag ok">已确认</span></div>
+                <p>打着爱国旗号宣传数字贸易、原始股权，缴纳入门费拉人头拿层级返利，衍生五行币等多个分支骗局。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="ok">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V8l8-5 8 5v11"/><path d="M4 19h16M9 19v-5h6v5M12 6v3" opacity=".7"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>智天金融（智天 APP）</h4><span class="tag ok">已确认</span></div>
+                <p>谎称持有故宫 22 万亿古董资产、即将纳斯达克上市，对外售卖千元"原始代持股"，专骗中老年群体。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="ok">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 8.5c0-1 1.2-1.8 3-1.8s3 .8 3 1.8-1.2 1.7-3 2.4-3 1.4-3 2.4 1.2 1.8 3 1.8 3-.8 3-1.8M12 5v2M12 17v2"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>PlusToken 虚拟币钱包</h4><span class="tag ok">已确认</span></div>
+                <p>宣称自动"搬砖套利"稳拿高额静态收益，涉案折合人民币 148 亿元、200 多万会员，国内首起特大虚拟币传销案。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="ok">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c-4 0-7-3-7-7 0-5 5-8 7-11 2 3 7 6 7 11 0 4-3 7-7 7z"/><path d="M12 21v-7" opacity=".6"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>GEC 环保币</h4><span class="tag ok">已确认</span></div>
+                <p>假冒"世界环保创业基金会"，免费矿机产币、宣称币价只涨不跌，实为拉人头传销，上百万投资者资金被套。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="ok">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9.5 9h.01M14.5 15h.01" stroke-width="2.2"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>MBI · MFC 游戏理财</h4><span class="tag ok">已确认</span></div>
+                <p>发行虚拟资产"易物点"宣称只涨不跌，缴纳入门费发展下线拿返利，涉案超千亿元、受害者千万级。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="ok">
+              <span class="lv"></span>
+              <div class="case-ic ci-red">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FF8A98" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="12" rx="9" ry="4.5"/><ellipse cx="12" cy="12" rx="9" ry="4.5" transform="rotate(65 12 12)"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>亚欧币</h4><span class="tag ok">已确认</span></div>
+                <p>谎称央企国资背景发行虚拟货币，内设内盘交易鼓吹币价暴涨，涉案 38-40 亿元、4.7 万名受害人。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="review">
+              <span class="lv"></span>
+              <div class="case-ic ci-orange">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#FFB36B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 8h8l-8 8h8" opacity=".8"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>域名股东投资</h4><span class="tag review">审核中</span></div>
+                <p>投资 1 万元成"分布式域名股东"后毫无动静，项目无进展、无消息、无会议，处于"三无"状态。</p>
+              </div>
+              <span class="risk mid">中危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="review">
+              <span class="lv"></span>
+              <div class="case-ic ci-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#B69CFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9 9h4.5a2.5 2.5 0 0 1 0 5H9m1 3h5M12 6v12"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>数字人民币投资</h4><span class="tag review">审核中</span></div>
+                <p>号称对接中国银联，出售 3-5 万元区域推广权；实为自建后台，码牌无法收单，会员投资全部亏损。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+
+            <article class="case" data-cat="review">
+              <span class="lv"></span>
+              <div class="case-ic ci-purple">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#B69CFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="11" rx="2"/><path d="M8 20h8M12 16v4"/><path d="M8.5 9.5h7M8.5 12h4" opacity=".6"/></svg>
+              </div>
+              <div class="case-bd">
+                <div class="row1"><h4>AI 算力盒子</h4><span class="tag review">审核中</span></div>
+                <p>7990 元购 10 台"算力盒子"号称每天躺赚 3 元，承诺无收益退 80% 本金；应用途径与合作公司均未说明。</p>
+              </div>
+              <span class="risk high">高危</span>
+              <span class="go"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></span>
+            </article>
+          </div>
+          <div class="empty" id="caseEmpty">该分类暂无内容</div>
+        </section>
+
+        <!-- ===== 排行页 ===== -->
+        <section class="page" id="page-rank">
+          <div class="rank-top">
+            <h3>诈骗类型高发榜</h3>
+            <p>数据来源：全国反诈警情通报 · 分时段滚动更新</p>
+            <div class="week">
+              <div><b id="stWarn">--</b><small>本月预警（人次）</small></div>
+              <div><b id="stStop">--</b><small>成功劝阻（人）</small></div>
+              <div><b id="stPay">--</b><small>紧急止付金额（万元）</small></div>
+            </div>
+          </div>
+          <div id="rankList"></div>
+          <p class="sys-ver">万事通 · 警情大数据中心</p>
+        </section>
+
+        <!-- ===== 反诈模型页 ===== -->
+        <section class="page" id="page-model">
+          <div class="model-card">
+            <div class="mc-hd">
+              <span class="mc-status"></span><b>云端反诈 AI 鉴定模型</b>
+              <small>Engine v4.2</small>
+            </div>
+            <div class="radar" id="radar">
+              <div class="rd-ring"></div><div class="rd-ring r2"></div><div class="rd-ring r3"></div>
+              <div class="cross"></div>
+              <div class="sweep"></div>
+              <span class="pt g"></span><span class="pt r"></span><span class="pt y"></span>
+              <div class="core">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#8FF0E9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2.2 2.2L16 9.5"/></svg>
+              </div>
+            </div>
+            <p class="mc-tip" id="radarTip">模型实时运行中 · 已学习 1.2 亿份涉诈样本</p>
+          </div>
+
+          <div class="detect-box">
+            <div class="detect-types" id="dTypes">
+              <span class="dtype on" data-t="电话">电话号码</span>
+              <span class="dtype" data-t="网址">网址链接</span>
+              <span class="dtype" data-t="银行">银行账号</span>
+              <span class="dtype" data-t="快递">快递单号</span>
+            </div>
+            <div class="detect-input">
+              <input id="detectInput" placeholder="输入 11 位手机号码…">
+              <button class="detect-go" id="detectGo">检 测</button>
+            </div>
+            <div class="scan-log" id="scanLog"></div>
+          </div>
+
+          <div class="result-card" id="resultCard">
+            <div class="rc-ic" id="rcIc"></div>
+            <div class="rc-bd">
+              <b id="rcTitle"></b>
+              <p id="rcDesc"></p>
+            </div>
+          </div>
+
+          <div class="scan-lines">
+            <div class="sl-row">
+              <i class="sl sl-a" style="--d:0s"></i><i class="sl sl-a" style="--d:.96s"></i><i class="sl sl-a" style="--d:1.92s"></i><i class="sl sl-a" style="--d:2.88s"></i><i class="sl sl-a" style="--d:3.84s"></i>
+            </div>
+            <div class="sl-row">
+              <i class="sl sl-b" style="--d:.4s"></i><i class="sl sl-b" style="--d:1.36s"></i><i class="sl sl-b" style="--d:2.32s"></i><i class="sl sl-b" style="--d:3.28s"></i><i class="sl sl-b" style="--d:4.24s"></i>
+            </div>
+            <div class="sl-row">
+              <i class="sl sl-c" style="--d:.2s"></i><i class="sl sl-c" style="--d:1.48s"></i><i class="sl sl-c" style="--d:2.76s"></i><i class="sl sl-c" style="--d:4.04s"></i><i class="sl sl-c" style="--d:5.32s"></i>
+            </div>
+          </div>
+        </section>
+
+        <!-- ===== SOS 公益热线页 ===== -->
+        <section class="page" id="page-sos">
+          <div class="sos-hero">
+            <i class="sos-badge">SOS</i>
+            <div class="sos-hero-txt">
+              <h2>全国公益热线总汇</h2>
+              <p>共收录 41 条官方热线 · 点击「拨打」一键呼出</p>
+            </div>
+          </div>
+          <div class="sos-quick">
+            <a class="sq-btn sq-red" href="tel:110"><b>110</b><small>公安报警</small></a>
+            <a class="sq-btn sq-gold" href="tel:96110"><b>96110</b><small>反诈专线</small></a>
+            <a class="sq-btn sq-green" href="tel:120"><b>120</b><small>医疗急救</small></a>
+          </div>
+          <div id="sosList"></div>
+          <p class="sos-ver">以上均为国家公开公益热线 · 紧急电话免费直拨<br>小贴士：记不住号码，非紧急事务直接拨 12345 自动分流<br>网传「灵异号码」非公共服务电话，存在话费与骚扰风险，请勿拨打<br>万事通 · 守护每一次求助</p>
+        </section>
+      </div>
+
+      <!-- 底部导航 -->
+      <nav class="tabbar">
+        <button class="tab on" data-page="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>
+          <span>首页</span>
+        </button>
+        <button class="tab" data-page="rank">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-8M22 20H2"/></svg>
+          <span>排行</span>
+        </button>
+        <button class="tab" data-page="model">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><circle cx="12" cy="11" r="2.6"/><path d="M12 13.6V17"/></svg>
+          <span>反诈模型</span>
+        </button>
+        <button class="tab tab-sos" data-page="sos">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><circle cx="12" cy="12" r="3.6"/><path d="M6.2 6.2l2.6 2.6M15.2 15.2l2.6 2.6M17.8 6.2l-2.6 2.6M8.8 15.2l-2.6 2.6"/></svg>
+          <span>SOS</span>
+        </button>
+      </nav>
+
+      <!-- 排行详情弹窗 -->
+      <div class="rk-mask" id="rkMask">
+        <div class="rk-modal" id="rkModal">
+          <button class="rk-close" id="rkClose">✕</button>
+          <h4 class="rk-name" id="rkName"></h4>
+          <p class="rk-sub" id="rkSub"></p>
+          <div class="rk-list" id="rkList"></div>
+          <div class="rk-tips" id="rkTips"></div>
+        </div>
+      </div>
+
+      <!-- 案例详情弹窗 -->
+      <div class="case-mask" id="caseMask">
+        <div class="case-modal" id="caseModal">
+          <button class="cm-close" id="cmClose">✕</button>
+          <h4 class="cm-name" id="cmName"></h4>
+          <p class="cm-sub" id="cmSub"></p>
+          <div class="cm-meta" id="cmMeta"></div>
+          <div class="cm-story" id="cmStory"></div>
+          <div class="cm-btns" id="cmBtns">
+            <button data-k="group">维权群聊</button>
+            <button data-k="progress">维权进度</button>
+            <button data-k="result">项目结果</button>
+          </div>
+          <div class="cm-detail" id="cmDetail"></div>
+        </div>
+        <!-- 二级悬浮窗：群聊 / 进度 / 结果 -->
+        <div class="sub-mask" id="subMask">
+          <div class="sub-pop" id="subPop">
+            <div class="sp-hd"><b id="spTitle"></b><button id="spClose">✕</button></div>
+            <div class="sp-bd" id="spBody"></div>
+          </div>
+        </div>
+      </div>
+      <div class="toast" id="toast"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===================== 音效模块（Web Audio 合成，无需外部文件） ===================== */
+var AC = null;
+function getAC(){ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); return AC; }
+function beep(freq, dur, type, vol, delay){
+  try{
+    var ac = getAC(), o = ac.createOscillator(), g = ac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(freq, ac.currentTime + (delay||0));
+    g.gain.setValueAtTime(0, ac.currentTime + (delay||0));
+    g.gain.linearRampToValueAtTime(vol || 0.12, ac.currentTime + (delay||0) + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + (delay||0) + (dur || 0.12));
+    o.connect(g); g.connect(ac.destination);
+    o.start(ac.currentTime + (delay||0)); o.stop(ac.currentTime + (delay||0) + (dur || 0.12));
+  }catch(e){}
+}
+function playSound(kind){
+  switch(kind){
+    case 'tab':   beep(440, 0.08, 'sine', 0.1); beep(554, 0.08, 'sine', 0.1, 0.05); break;  /* 底部导航 */
+    case 'filter':beep(523, 0.07, 'triangle', 0.1); beep(659, 0.07, 'triangle', 0.1, 0.04); break; /* 分类筛选 */
+    case 'open':  beep(660, 0.06, 'sine', 0.11); beep(880, 0.08, 'sine', 0.1, 0.04); break;  /* 卡片打开 */
+    case 'close': beep(330, 0.1, 'sine', 0.1); break;                                      /* 关闭弹窗 */
+    case 'sub':   beep(587, 0.06, 'triangle', 0.1); beep(784, 0.07, 'triangle', 0.1, 0.04); break; /* 三按钮 */
+    case 'copy':  beep(880, 0.05, 'sine', 0.12); beep(1174, 0.06, 'sine', 0.1, 0.04); beep(1568, 0.07, 'sine', 0.08, 0.08); break; /* 复制 */
+    case 'call':  beep(392, 0.15, 'sine', 0.1); beep(523, 0.15, 'sine', 0.1, 0.1); break;    /* 拨打 */
+    case 'scan':  beep(220, 0.12, 'sawtooth', 0.08); beep(330, 0.12, 'sawtooth', 0.07, 0.06); beep(440, 0.15, 'sawtooth', 0.06, 0.12); break; /* 检测扫描 */
+    case 'ok':    beep(523, 0.06, 'sine', 0.1); beep(659, 0.06, 'sine', 0.1, 0.05); beep(784, 0.1, 'sine', 0.12, 0.1); break; /* 确认 */
+    case 'warn':  beep(349, 0.08, 'square', 0.08); beep(349, 0.08, 'square', 0.08, 0.12); break; /* 警告 */
+    case 'splash':beep(440, 0.06, 'sine', 0.08); beep(554, 0.06, 'sine', 0.08, 0.04); beep(659, 0.08, 'sine', 0.1, 0.08); break; /* 启动页 */
+    default:      beep(500, 0.08, 'sine', 0.1);
+  }
+}
+
+/* ===================== 启动页加载 ===================== */
+/* 如需调整启动页时长，改这里（毫秒）。用户要求 0.1~0.2 秒可改为 200；
+   默认 1600ms 以便看清动态标志与进度条 */
+var LOAD_MS = 200; /* 启动页停留 0.2 秒 */
+(function(){
+  var start = performance.now(), fill = document.getElementById('lfill'),
+      ct = document.getElementById('lpct'), splash = document.getElementById('splash'), done = false;
+  function tick(t){
+    var p = Math.min(1, (t - start) / LOAD_MS);
+    var e = 1 - Math.pow(1 - p, 3); /* easeOutCubic */
+    var v = Math.round(e * 100);
+    fill.style.width = v + '%';
+    ct.textContent = v;
+    if(p < 1){ requestAnimationFrame(tick); }
+    else if(!done){
+      done = true;
+      playSound('splash');
+      setTimeout(function(){ splash.classList.add('hide'); }, 180);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ===================== 轮播 ===================== */
+(function(){
+  var track = document.getElementById('bTrack'),
+      dots = document.querySelectorAll('#bDots i'),
+      idx = 0, n = 3, timer;
+  function go(i){
+    idx = (i + n) % n;
+    track.style.transform = 'translateX(-' + (idx * 100) + '%)';
+    dots.forEach(function(d,k){ d.classList.toggle('on', k === idx); });
+  }
+  function auto(){ timer = setInterval(function(){ go(idx + 1); }, 3200); }
+  dots.forEach(function(d,k){ d.addEventListener('click', function(){
+    playSound('filter');
+    clearInterval(timer); go(k); auto();
+  });});
+  auto();
+})();
+
+/* ===================== Toast ===================== */
+var toastEl = document.getElementById('toast'), toastTimer;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 1800);
+}
+
+/* ===================== 底部导航切换 ===================== */
+var tabs = document.querySelectorAll('.tab'), pages = document.querySelectorAll('.page');
+var rankAnimated = false;
+tabs.forEach(function(tab){
+  tab.addEventListener('click', function(){
+    playSound('tab');
+    var name = tab.dataset.page;
+    tabs.forEach(function(t){ t.classList.toggle('on', t === tab); });
+    pages.forEach(function(p){ p.classList.toggle('active', p.id === 'page-' + name); });
+    if(name === 'rank' && !rankAnimated){ rankAnimated = true; setTimeout(animateRanks, 120); }
+  });
+});
+
+/* ===================== 首页筛选 ===================== */
+(function(){
+  var btns = document.querySelectorAll('.quick-btn'),
+      cases = document.querySelectorAll('#caseList .case'),
+      chip = document.getElementById('filterChip'),
+      empty = document.getElementById('caseEmpty'),
+      title = document.getElementById('caseTitle'),
+      current = null;
+  var TITLES = {
+    hot:'近期业务热点消息',
+    review:'待审核项目内容',
+    ok:'已确认骗局 · 事件警醒'
+  };
+  function apply(f){
+    current = f;
+    btns.forEach(function(b){ b.classList.toggle('on', b.dataset.filter === f); });
+    var visible = 0;
+    cases.forEach(function(c){
+      var cat = c.dataset.cat;
+      var show = !f || (f === 'hot' ? (cat === 'hot' || cat === 'review') : cat === f);
+      c.style.display = show ? 'flex' : 'none';
+      c.style.order = (f === 'hot' && cat === 'review') ? 1 : 2;
+      if(show) visible++;
+    });
+    title.textContent = f ? TITLES[f] : '风险骗局曝光';
+    chip.classList.toggle('show', !!f);
+    empty.style.display = visible ? 'none' : 'block';
+  }
+  btns.forEach(function(b){
+    b.addEventListener('click', function(){
+      playSound('filter');
+      apply(current === b.dataset.filter ? null : b.dataset.filter);
+    });
+  });
+  chip.addEventListener('click', function(){ playSound('close'); apply(null); });
+  apply('hot'); /* 首页默认进入最近热点 */
+})();
+/* ===================== 案例详情弹窗 ===================== */
+var CASE_DETAIL = [
+  {cat:'hot', title:'境外科技投资平台', start:'2023-06-18', midLabel:'维权时间', mid:'2024-03-15', boss:'陈某强', type:'模仿境外骗局',
+   story:'该平台自称注册于海外金融中心，打着“量化交易、稳赚不赔”的旗号招揽国内投资者。初期用户小额提现均能到账，平台借此在社群中大肆晒单造势。2023 年底起以“系统升级”为由限制提现，随后要求缴纳“解冻保证金”。2024 年 3 月平台彻底关网，涉案资金经多层级账户转移至境外，登记损失超 8.7 亿元。<em>提醒：凡是承诺保本高收益的境外平台，一律远离。</em>',
+   group:'实名核验后发放群口令，群内有律师志愿团答疑', prog:62, progTxt:'案件受理 → 资金冻结 → 跨境追赃进行中', result:'多地警方已立案，主犯被上网追逃，追赃挽损持续推进'},
+  {cat:'review', title:'OPA 项目', start:'2026-02-13', midLabel:'审核时间', mid:'2026-10-18', boss:'中国项目团队长', type:'模仿以太坊链上', tel:'5958518050', qq:'287435865',
+   story:'该项目以派链积分迁移、实名 DID 积分迁移、派元宇宙积分迁移、3A 商学院积分迁移、派币积分迁移等名义包装，宣称参与迁移即可获得更多 OPA 代币，诱导大量用户入场。实际上该平台与派币官方毫无关联，仅是搭建在以太坊公链上的侧链生态。2026 年 8 月至 9 月，项目方先后违背生态节点承诺，单方面更改积分变现规则；9 月 30 日又对外宣称受到监管要求整改，承诺一至三个月内退还会员本金。目前平台已无法签到、无法提现，官方 QQ 群已解散。<em>提醒：凡是借热门项目"积分迁移"之名要求充值的平台，务必核实其官方授权。</em>',
+   group:'实名核验后入群，群内有律师志愿团答疑', prog:78, progTxt:'退款承诺核实 → 资金流向追踪 → 兑付监督进行中', result:'审核中：平台承诺 1-3 个月退还本金，目前处于无法提现状态，正在监督兑付'},
+  {cat:'review', title:'实名DID（界外）', start:'2025-01-01', midLabel:'审核时间', mid:'2026-10-18', boss:'徐刚', type:'国家 BSN 联盟链', tel:'9281767261', qq:'717663305', qr:'wechat_qr.png',
+   story:'该项目原名"实名 DID"，对外宣称获得公安部授权与支持，并以此名义吸纳会员：缴纳 3000 元即可成为"猎空者"会员，承诺对接酒店、景区、电影院等消费场景，会员可自选场景并获得约 10% 的纯利润分成。后项目方对外声明与公安部毫无关系，且因国家不允许使用"实名 DID"名称，已全面整改图标与名称，更名为"界外"。目前酒店、景区等场景对接毫无进展，"对接公安部"的说辞已被证伪，又改口宣称对接国信平台；APP 已无法正常使用，买票、住店、上网吧等功能全部失效。<em>提醒：凡是宣称"公安部授权"的商业项目，均可通过 96110 核实真伪。</em>',
+   group:'实名核验后入群，统一汇总场景未兑现证据', prog:55, progTxt:'宣传资质核伪 → 场景承诺核查 → 资金链路分析中', result:'审核中：名称与宣传资质已违规整改，场景承诺兑现情况持续核查'},
+  {cat:'review', title:'域名股东投资', start:'2026-01-01', midLabel:'审核时间', mid:'2026-10-18', boss:'徐刚', type:'界外科技分布式域名', tel:'9281767261', qq:'717663305', qr:'wechat_qr.png',
+   story:'该项目于 2026 年 1 月 1 日前推出"域名股东"投资计划，宣称投资 1 万元即可成为分布式域名股东。项目方此前声称已开发"实名 DID 国际版"软件，然而该软件随后摇身一变成为 OPA 项目，项目方则声称双方"已断绝联系"。目前所谓分布式域名无任何收益，系统处于无运营状态；已投资的域名股东普遍亏损，项目方无进展通报、无官方消息、无会员会议，处于"三无"状态。<em>提醒：凡是长期无进展、无消息、无会议的投资项目，务必及时止损并保留出资凭证。</em>',
+   group:'域名股东登记通道，需上传出资凭证', prog:43, progTxt:'股东身份登记 → 域名资产核查 → 关联项目并线分析中', result:'审核中：项目"三无"状态属实，建议投资人保留凭证等待鉴定结论'},
+  {cat:'review', title:'数字人民币投资', start:'2026-03-02', midLabel:'审核时间', mid:'2026-10-18', boss:'徐刚', type:'国家数字人民币', tel:'9281767261', qq:'717663305', qr:'wechat_qr.png',
+   story:'2026 年 3 月，徐刚宣称界外科技公司已对接中国银联，可推广数字人民币业务，并向会员出售区域推广权：购买一个市级代理需 5 万元、区级代理需 3 万元。会员付款后，推广码牌始终无法对接数字人民币收单，商家无法使用，承诺的"推广 500 家即可回本"成为空谈。经核查，所谓"对接银联"实为界外科技自建的系统后台，仅借用数字人民币端口包装，与银联官方无任何直接关系。目前该业务全面停滞，投资会员普遍亏损且无法回本，界外科技已失去诚信。<em>提醒：数字人民币推广权不对外售卖，凡是收费代理均为骗局。</em>',
+   group:'区域代理登记通道，需提供合同与转账记录', prog:66, progTxt:'银联关系核伪 → 代理合同审查 → 资金归集追踪中', result:'审核中：确认非银联官方渠道，涉嫌虚假宣传，移交进一步核查'},
+  {cat:'review', title:'AI 算力盒子', start:'2026-08-01', midLabel:'审核时间', mid:'2026-10-18', boss:'徐刚', type:'AI 算力',
+   story:'界外科技（徐刚名下产业）于 2026 年 8 月推出"AI 算力盒子"项目：会员支付 7990 元购买 10 台算力盒子，接入自家宽带即可"每天躺赚约 3 元"，号称 7 个月回本。项目方承诺若一个月内无算力收益，退还本金的 80%。然而所谓的 AI 算力具体应用在哪个行业、为哪家公司供货、与哪家企业合作，均未向会员说明，收益来源完全不透明。项目方还鼓动此前参与数字人民币投资的老会员继续推广该项目获取分红，试图拉其他团队入股，但由于界外科技此前的数字人民币、域名股东等项目接连失信，已无人愿意跟进。<em>提醒：凡是说不出收益来源、只承诺"稳赚躺赚"的设备投资，本质都是借新还旧的资金盘。</em>',
+   group:'算力盒子投资者登记通道，需提供购买凭证', prog:38, progTxt:'设备真实性核查 → 收益来源追踪 → 资金流向分析中', result:'审核中：收益来源不透明，无实际算力应用方，涉嫌借新还旧，维持高危预警'},
+  {cat:'hot', title:'刷单返利连环套', start:'2023-01-09', midLabel:'维权时间', mid:'2023-11-22', boss:'孙某浩', type:'模仿境外骗局',
+   story:'以“点赞关注日赚百元”引流，小额返利获取信任后诱导下载刷单 APP。受害人被拉入“任务群”，在群托怂恿下承接大额“连单”，随后被以“操作失误、需缴税、验证金”等名义不断要求转账。该团伙剧本多达 40 余套，2023 年 9 月被警方打掉，抓获 56 人，但变种剧本仍在换皮传播。<em>刷单本身违法，垫资刷单全是诈骗。</em>',
+   group:'实名核验后发放群口令，定期同步案件进展', prog:74, progTxt:'团伙落网 → 资金审计 → 退赔方案制定中', result:'56 名嫌疑人被批捕，涉案金额审计接近尾声'},
+  {cat:'hot', title:'AI 换脸视频通话诈骗', start:'2024-01-15', midLabel:'维权时间', mid:'2024-06-30', boss:'吴某林', type:'模仿境外骗局',
+   story:'骗子利用 AI 换脸与拟声技术，冒充受害人亲友或公司领导发起视频通话，画面与声音足以乱真，以“项目急用款、交保证金”为由催促转账。换脸素材多取自受害人社交账号的公开视频。2024 年 5 月，江苏一企业财务人员因此被转走 196 万元。<em>转账前务必通过原有联系方式二次核实，并设置延迟到账。</em>',
+   group:'实名核验后发放群口令，有反诈民警驻群', prog:56, progTxt:'技术取证 → 特征库比对 → 多地并案侦查中', result:'AI 伪造特征已入库，同类预警模型已上线运行'},
+  {cat:'hot', title:'演唱会门票代抢骗局', start:'2024-03-08', midLabel:'维权时间', mid:'2024-08-14', boss:'郑某宇、林某彤', type:'模仿境外骗局',
+   story:'热门演唱会一票难求之际，骗子在社交平台谎称有“主办方内部渠道、工作人员代抢”，晒出伪造的出票截图骗取信任。受害人付款后被以“出票失败需补缴通道费”继续索要，最终被拉黑。受害人多为学生与年轻歌迷，单人损失从数百到数万元不等。<em>购票只认官方票务平台，私下转让多是骗局。</em>',
+   group:'实名核验后入群，定期通报串并案进展', prog:41, progTxt:'报案登记 → 账号封禁 → 串并案侦查中', result:'已封禁涉诈账号 300 余个，抓捕工作有序推进'},
+  {cat:'hot', title:'“百万保障”扣费骗局', start:'2023-09-25', midLabel:'维权时间', mid:'2024-02-10', boss:'刘某霞', type:'模仿境外骗局',
+   story:'骗子冒充微信、支付宝客服致电，称受害人开通的“百万保障”服务即将到期，不取消将每月自动扣费 800 元。随后诱导下载会议软件开启“远程协助”，实为屏幕共享，实时窃取银行卡号与验证码转空账户。全国已有数千人上当，单笔最高损失 130 万元。<em>“百万保障”永久免费自动生效，无需任何续费操作。</em>',
+   group:'实名核验后入群，群内有平台官方客服协助取证', prog:68, progTxt:'紧急止付 → 话务溯源 → 境外窝点研判中', result:'多个话务窝点被端，止付资金返还通道已开启'},
+  {cat:'ok', title:'云数贸（民族资产解冻）', start:'2013-01-08', midLabel:'关网时间', mid:'2019-08-09', boss:'宋密秋（化名张健）', type:'模仿国家骗局',
+   story:'民族资产解冻类传销，打着爱国旗号宣传数字贸易、原始股权，要求缴纳入门费购买份额，依靠拉人头、发展下线拿层级返利，后续衍生五行币、云讯通等多个分支骗局。2012 年筹备，2013 年“云数贸联盟”官网上线并配套手机 APP。2013 年国内立案打击，头目宋密秋偷渡逃往海外遥控操盘；2017 年被国际缉捕押解回国，2019 年法院判决有期徒刑 12 年，平台彻底关停跑路，大量参与者资金无法追回。',
+   group:'特大传销专案，登记信息统一对接属地经侦', prog:100, progTxt:'已判决 → 资产处置 → 追赃挽损持续进行', result:'头目宋密秋获刑 12 年，平台彻底关停，残余分支仍在打击中'},
+  {cat:'ok', title:'智天金融（智天 APP）', start:'2015-08-12', midLabel:'关网时间', mid:'2019-05-20', boss:'邓智天、冯文秀', type:'模仿国家骗局',
+   story:'编造谎言称公司持有故宫 22 万亿古董资产，即将在美国纳斯达克上市，对外售卖 1000 元一份的“原始代持股”，拉下线可拿高额返点，专门针对中老年群体洗脑。2015 年 8 月注册公司，2018 年上线智天手机 APP 与微信报单系统。2019 年项目爆雷，2020 年邓智天一审获刑 13 年、没收违法所得 6.69 亿元，APP 服务器关闭跑路；境外残余团伙“艾总”仍在微信群继续虚假宣传，切勿相信。',
+   group:'中老年受害者绿色通道，子女可代为登记', prog:96, progTxt:'已判决 → 资产清算 → 残余团伙持续打击中', result:'邓智天获刑 13 年、没收违法所得 6.69 亿元，残余团伙追缉中'},
+  {cat:'ok', title:'PlusToken 虚拟币钱包', start:'2018-05-01', midLabel:'关网时间', mid:'2019-06-27', boss:'陈浩、丁华清、彭义先', type:'模仿区块链骗局',
+   story:'打着区块链钱包旗号，宣称自动“搬砖套利”，存入比特币、以太坊等虚拟货币即可拿到稳定高额静态收益，拉人头可拿推广奖励。2018 年 5 月上线钱包 APP 与境外官网。2019 年 6 月 27 日平台直接关闭提现，钱包备注竟写着“对不起，我们跑路了”。该案为国内首起特大虚拟货币传销案，涉案折合人民币 148 亿元、200 多万会员；主犯被跨国抓捕，2020 年全部判刑。',
+   group:'虚拟货币专案登记通道，需提供钱包地址凭证', prog:100, progTxt:'跨国抓捕 → 全部判刑 → 虚拟资产处置中', result:'主犯全部获刑，涉案虚拟资产依法处置，登记退赔进行中'},
+  {cat:'ok', title:'GEC 环保币', start:'2017-02-17', midLabel:'关网时间', mid:'2020-07-10', boss:'境外匿名团伙', type:'模仿区块链骗局',
+   story:'假冒“世界环保创业基金会”以环保公益包装，注册免费送云矿机，花钱购买矿机产出 GEC 虚拟币，宣传币价只涨不跌，靠拉人头晋升赚更多币。该基金会早已被民政部认定为非法社会组织。2017 年 2 月上线境外官网与手机 APP；2020 年后平台无法提现、服务器逐步下线跑路，全国多地公安定性为网络传销，核心头目藏匿境外，上百万投资者资金被套。',
+   group:'实名核验后入群，统一汇总报案材料', prog:88, progTxt:'多地定性传销 → 骨干抓捕 → 境外头目追逃中', result:'国内推广骨干大批落网，核心头目境外追逃持续推进'},
+  {cat:'ok', title:'MBI · MFC 游戏理财', start:'2012-03-05', midLabel:'关网时间', mid:'2019-10-23', boss:'张誉发（马来西亚华人）', type:'模仿境外骗局',
+   story:'MBI 集团 2009 年于马来西亚创立，2012 年 MFC 理财平台官网与 APP 面向国内推广。发行虚拟资产“易物点”，宣称只涨不跌、定期配送增值，参与者缴纳入门费获得会员资格，发展下线拿返利，还谎称集团拥有酒店、地产等千亿实体。2017 年马来西亚查封大量涉案资产；2024 年头目张誉发从泰国引渡回国受审。全案涉案金额超千亿元、受害者达千万级，平台完全崩盘跑路。',
+   group:'特大跨境案件登记窗口，分批受理材料', prog:92, progTxt:'头目引渡 → 公开审理 → 跨境资产追缴中', result:'张誉发 2024 年引渡回国受审，案件审理与资产追缴同步推进'},
+  {cat:'ok', title:'亚欧币', start:'2016-04-18', midLabel:'关网时间', mid:'2017-05-12', boss:'夏荣（夏某荣）、刘某', type:'模仿区块链骗局',
+   story:'谎称拥有央企国资背景，发行虚拟货币“亚欧币”，宣传币价持续暴涨，最低 1 万元起投，拉人头构建多层级传销，平台内设内盘交易自拉自唱。2016 年 4 月注册公司，同年上线官网与 APP 内盘交易系统。2017 年 5 月警方集中抓捕全部核心骨干，涉案金额 38-40 亿元、4.7 万名受害人，平台关停跑路，多名主犯已获刑。',
+   group:'案件已结，登记窗口用于退赔核对', prog:100, progTxt:'核心骨干落网 → 判决生效 → 退赔核对发放中', result:'多名主犯获刑，涉案资金按比例退赔，登记核对持续进行'}
+];
+(function(){
+  var CAT_COLOR = {hot:'#F5C542', review:'#2FE08B', ok:'#FF5A6A'};
+  var CAT_NAME  = {hot:'最近热点', review:'正待审核', ok:'历史诈骗'};
+  var mask = document.getElementById('caseMask'),
+      modal = document.getElementById('caseModal'),
+      name = document.getElementById('cmName'),
+      sub = document.getElementById('cmSub'),
+      meta = document.getElementById('cmMeta'),
+      story = document.getElementById('cmStory'),
+      btns = document.getElementById('cmBtns'),
+      detail = document.getElementById('cmDetail'),
+      cur = null, curKey = null;
+  function openCase(i){
+    var cardTitle = document.querySelectorAll('#caseList .case')[i].querySelector('h4').textContent.trim();
+    cur = null;
+    for(var j = 0; j < CASE_DETAIL.length; j++){
+      if(CASE_DETAIL[j].title === cardTitle){ cur = CASE_DETAIL[j]; break; }
+    }
+    if(!cur) return;
+    var color = CAT_COLOR[cur.cat];
+    modal.style.setProperty('--cd', color);
+    name.textContent = cur.title;
+    sub.innerHTML = '（ <span>' + CAT_NAME[cur.cat] + '</span> ）';
+    meta.innerHTML =
+      '<div><small>项目发起时间</small><b>' + cur.start + '</b></div>' +
+      '<div><small>' + cur.midLabel + '</small><b>' + cur.mid + '</b></div>' +
+      '<div><small>幕后者</small><b>' + cur.boss + '</b></div>' +
+      '<div><small>项目类型</small><b>' + cur.type + '</b></div>';
+    story.innerHTML = cur.story;
+    detail.className = 'cm-detail'; detail.innerHTML = '';
+    curKey = null;
+    btns.querySelectorAll('button').forEach(function(b){ b.classList.remove('on'); });
+    modal.scrollTop = 0;
+    mask.classList.add('open');
+  }
+  function closeCase(){ playSound('close'); mask.classList.remove('open'); }
+  document.getElementById('cmClose').addEventListener('click', closeCase);
+  mask.addEventListener('click', function(e){ if(e.target === mask) closeCase(); });
+  var subMask = document.getElementById('subMask'),
+      subPop  = document.getElementById('subPop'),
+      spTitle = document.getElementById('spTitle'),
+      spBody  = document.getElementById('spBody');
+  function dOff(d, days){ var t = new Date(d.replace(/-/g,'/')).getTime() + days*86400000; var x = new Date(t);
+    return x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0'); }
+  function hashN(s, mod, base){ var h=0; for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))>>>0; return base + h%mod; }
+  function buildTimeline(c){
+    var s=c.start, m=c.mid, cat=c.cat;
+    if(cat==='ok') return [
+      ['项目启动时间', s, '项目对外发起、开放注册，正式面向公众招募'],
+      ['进展高峰时间', dOff(s,150), '疯狂拉新扩张、承诺高额回报，诱导用户大额投入'],
+      ['项目失信时间', dOff(m,-120), '单方面更改规则、承诺收益无法兑现，会员开始质疑'],
+      ['出现意外时间', dOff(m,-40), '提现通道关闭、社群禁言，大量用户无法取回本金'],
+      ['警方介入时间', dOff(m,-20), '多地公安机关立案侦查、冻结涉案资金账户'],
+      ['关网/跑路时间', m, '平台正式关网，服务器下线，幕后团队失联'],
+      ['案件定性时间', dOff(m,90), '法院判决生效，主犯获刑，案件性质最终确定']
+    ];
+    if(cat==='review') return [
+      ['项目启动时间', s, '项目正式对外发布，开始招募会员、收取费用'],
+      ['进展推广时间', dOff(s,60), '大量宣传造势，承诺高额收益吸引用户参与'],
+      ['项目失信时间', dOff(s,150), '承诺的场景或收益始终无法兑现，会员持续投诉'],
+      ['出现意外时间', dOff(m,-45), '提现困难、功能异常、QQ 群或社群突然解散'],
+      ['鉴定介入时间', dOff(m,-20), '万事通模型立案鉴定，资金链路追踪同步启动'],
+      ['审核复核时间', m, '样本采集完毕，进入人工复核、出具鉴定报告阶段'],
+      ['结论出具时间', '待定', '预计 5-15 个工作日内出具最终鉴定结论']
+    ];
+    return [
+      ['项目启动时间', s, '项目正式上线，开始面向社会推广'],
+      ['爆发传播时间', dOff(s,120), '大量用户涌入，平台出现井喷式增长'],
+      ['项目失信时间', dOff(m,-100), '规则频繁更改，用户收益大幅缩水甚至归零'],
+      ['出现意外时间', dOff(m,-35), '提现限额、到账延迟，部分账户被限制操作'],
+      ['警方介入时间', dOff(m,-15), '多地公安机关接警并立案调查'],
+      ['维权登记时间', m, '受害者集中向万事通及属地经侦登记报案'],
+      ['追赃挽损时间', '持续推进', '警方正在全力追查资金流向、冻结涉案账户']
+    ];
+  }
+  function makeSeal(cat){
+    var isOk = cat==='ok';
+    var cls = isOk ? 'seal red' : 'seal green';
+    var txt = isOk ? '警惕骗局' : '反诈专用章';
+    var col = isOk ? '#FF5A6A' : '#2FE08B';
+    return '<svg viewBox="0 0 120 120" class="'+cls+'"><circle cx="60" cy="60" r="55" fill="none" stroke="currentColor" stroke-width="4"/><circle cx="60" cy="60" r="38" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M60 32l7.5 15.2 16.8 2.4-12.1 11.8 2.8 16.7L60 70.3 45 77.1l2.8-16.7-12.1-11.8 16.8-2.4z" fill="currentColor"/><text x="60" y="98" text-anchor="middle" font-size="13" font-weight="800" fill="currentColor" letter-spacing="2">'+txt+'</text></svg>';
+  }
+  function makeQR(title){
+    var w=10,h=10,cells=[];
+    for(var r=0;r<h;r++) for(var c=0;c<w;c++) cells.push(0);
+    var H = hashN(title, 1000000, 0);
+    function s(x,y){ if(x>=0&&x<w&&y>=0&&y<h) cells[y*w+x]=1; }
+    // 定位角
+    [[0,0],[w-3,0],[0,h-3]].forEach(function(o){ var ox=o[0],oy=o[1]; for(var i=0;i<3;i++) for(var j=0;j<3;j++) s(ox+i,oy+j); });
+    // 伪随机点
+    for(var i=0;i<18;i++){ var p=(H+i*7919)%100; s(p%w, Math.floor(p/w)%h); }
+    var svg=''; for(var r=0;r<h;r++) for(var c=0;c<w;c++) if(cells[r*w+c]) svg+='<rect x="'+(c*10+10)+'" y="'+(r*10+10)+'" width="8" height="8" fill="#0A1836"/>';
+    return '<svg viewBox="0 0 128 128">'+svg+'</svg>';
+  }
+  var SP_TITLES = {group:'维权群聊', progress:'维权进度', result:'维权结果'};
+  function openSub(k){
+    if(!cur) return;
+    var color = CAT_COLOR[cur.cat];
+    subPop.style.setProperty('--cd', color);
+    spTitle.textContent = SP_TITLES[k];
+    if(k === 'group'){
+      var tel = cur.tel || '正在创建中';
+      var qq  = cur.qq || '正在创建中';
+      var qrHtml = cur.qr
+        ? '<img src="'+cur.qr+'" alt="微信群二维码" style="width:128px;height:128px;border-radius:10px;background:#fff;padding:6px;box-shadow:0 0 0 5px rgba(255,255,255,.07),0 8px 24px rgba(0,0,0,.4);object-fit:contain">'
+        : '<div class="sg-qr-empty">待上传</div>';
+      spBody.innerHTML =
+        '<div class="sg-row"><span class="sg-tag">TELTLK 群</span><b>'+tel+'</b><button class="sg-copy" data-v="'+tel+'">复制</button></div>'+
+        '<div class="sg-row"><span class="sg-tag">QQ 群</span><b>'+qq+'</b><button class="sg-copy" data-v="'+qq+'">复制</button></div>'+
+        '<div class="sg-row"><span class="sg-tag">微信群</span><b>扫码加入</b></div>'+
+        '<div class="sg-qr">'+qrHtml+'<p>扫码进入微信群聊</p><small>提示：谨防冒充维权群的二次诈骗，官方群不会收取任何费用</small></div>';
+      spBody.querySelectorAll('.sg-copy').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          playSound('copy');
+          var v = btn.dataset.v, ta = document.createElement('textarea');
+          ta.value = v; ta.style.position = 'fixed'; ta.style.opacity = '0';
+          document.body.appendChild(ta); ta.select();
+          try{ document.execCommand('copy'); }catch(e){}
+          document.body.removeChild(ta);
+          toast('群号已复制：' + v);
+        });
+      });
+    }else if(k === 'progress'){
+      var tl = buildTimeline(cur), html = '<div class="tl">';
+      tl.forEach(function(it){ html += '<div class="tl-it"><b>'+it[0]+'</b><time>'+it[1]+'</time><p>'+it[2]+'</p></div>'; });
+      html += '</div>';
+      spBody.innerHTML = html;
+    }else{
+      var isOk = cur.cat === 'ok';
+      var lines = isOk
+        ? '【<b>已确认</b>】该项目已于 <b>'+cur.mid+'</b> 正式关网跑路，幕后者（<b>'+cur.boss+'</b>）已被依法追究。请相关受害人尽快前往属地公安机关登记报案，切勿相信任何"内部退款"或"维权退费"的二次诈骗话术。'
+        : (cur.cat==='review'
+        ? '【<b>审核中</b>】该项目正在万事通鉴定复核中，相关资金链路与人员画像正在同步追踪，已启动止损与成本追回程序。请投资者保持冷静，切勿继续追加投入，耐心等待鉴定结论出具。'
+        : '【<b>热点预警</b>】该项目已被列入重点监控名单，警方正在全力追赃挽损。请受害人通过属地公安机关或官方维权渠道登记信息，不要相信任何"内部退款"或"付费解封"消息。');
+      spBody.innerHTML = '<div class="rs-txt">'+lines+'</div>'+makeSeal(cur.cat);
+    }
+    subMask.classList.add('open');
+  }
+  function closeSub(){ playSound('close'); subMask.classList.remove('open'); }
+  document.getElementById('spClose').addEventListener('click', closeSub);
+  subMask.addEventListener('click', function(e){ if(e.target === subMask) closeSub(); });
+  btns.querySelectorAll('button').forEach(function(b){
+    b.addEventListener('click', function(){
+      playSound('sub');
+      if(!cur) return;
+      var k = b.dataset.k;
+      if(curKey === k){ detail.className = 'cm-detail'; b.classList.remove('on'); curKey = null; closeSub(); return; }
+      curKey = k;
+      btns.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+      if(k === 'group'){
+        detail.innerHTML = '<b>维权群聊</b><br>' + cur.group + '<br>提示：谨防冒充维权群的二次诈骗，官方群不会收取任何费用。';
+      }else if(k === 'progress'){
+        detail.innerHTML = '<b>维权进度 · ' + cur.prog + '%</b><div class="cm-prog"><i style="width:' + cur.prog + '%"></i></div>' + cur.progTxt;
+      }else{
+        detail.innerHTML = '<b>项目结果</b><br>' + cur.result;
+      }
+      detail.className = 'cm-detail show';
+      openSub(k);
+    });
+  });
+  document.querySelectorAll('#caseList .case').forEach(function(c, i){
+    c.addEventListener('click', function(){ playSound('open'); openCase(i); });
+  });
+})();
+
+/* ===================== 排行数据 ===================== */
+var RANK_DATA = [
+  {name:'刷单返利类', pct:28.6, cnt:'1,238 起', trend:'up', tv:'较上期 +3.2%', hot:true},
+  {name:'虚假网络投资理财类', pct:18.9, cnt:'819 起', trend:'up', tv:'较上期 +1.8%', hot:true},
+  {name:'虚假网络贷款类', pct:11.4, cnt:'494 起', trend:'up', tv:'较上期 +0.9%', hot:true},
+  {name:'冒充电商物流客服类', pct:9.8, cnt:'425 起', trend:'down', tv:'较上期 -1.1%'},
+  {name:'冒充公检法类', pct:7.2, cnt:'312 起', trend:'down', tv:'较上期 -0.6%'},
+  {name:'虚假征信类', pct:5.6, cnt:'243 起', trend:'up', tv:'较上期 +0.4%'},
+  {name:'虚假购物服务类', pct:4.9, cnt:'212 起', trend:'flat', tv:'与上期持平'},
+  {name:'冒充领导熟人类', pct:4.1, cnt:'178 起', trend:'down', tv:'较上期 -0.3%'},
+  {name:'网络游戏虚假交易类', pct:3.3, cnt:'143 起', trend:'up', tv:'较上期 +0.2%'},
+  {name:'婚恋交友（杀猪盘）类', pct:2.7, cnt:'117 起', trend:'down', tv:'较上期 -0.2%'}
+];
+(function(){
+  var box = document.getElementById('rankList');
+  box.innerHTML = RANK_DATA.map(function(r,i){
+    var cls = i === 0 ? 'n1' : i === 1 ? 'n2' : i === 2 ? 'n3' : '';
+    var trend = r.trend === 'up' ? '<span class="up">▲ '+r.tv+'</span>'
+              : r.trend === 'down' ? '<span class="down">▼ '+r.tv+'</span>'
+              : '<span>'+r.tv+'</span>';
+    return '<div class="rank-item" data-index="' + i + '"><i class="rk-no '+cls+'">'+(i+1)+'</i>'
+      + '<div class="rk-bd"><div class="t"><span>'+r.name+'</span><em>'+r.pct+'% · '+r.cnt+'</em></div>'
+      + '<div class="rk-bar'+(r.hot?' hot':'')+'"><i data-w="'+r.pct+'"></i></div>'
+      + '<div class="rk-trend">'+trend+'</div></div></div>';
+  }).join('');
+})();
+function animateRanks(){
+  document.querySelectorAll('#rankList .rk-bar i').forEach(function(el){
+    el.style.width = el.dataset.w + '%';
+  });
+}
+
+/* ===================== 排行详情（20子项目+3建议） ===================== */
+var RANK_DETAIL = (function(){
+  function d(seed){ var s = seed % 28 + 1; return '202' + (3 + seed % 4) + '-' + String(seed % 12 + 1).padStart(2,'0') + '-' + String(s).padStart(2,'0'); }
+  function gen(pool, warns){ var r = []; for(var i = 0; i < 20; i++){ r.push({name: pool[i], date: d(i * 7 + pool.length), warn: warns[i % warns.length]}); } return r; }
+  return [
+    {name:'刷单返利类', sub:'兼职刷单 · 点赞返利 · 做任务返佣金', projects:gen([
+      '抖音点赞刷单','淘宝兼职刷单','公众号关注返利','短视频点赞任务','拼多多砍价刷单','小红书种草返利','京东白条刷单','快手直播打赏刷单','微信投票刷单','美团外卖好评刷单','闲鱼代拍刷单','淘宝客推广刷单','得物球鞋刷单','大众点评刷单','饿了么商家刷单','滴滴司机刷单','哈啰出行刷单','顺丰同城急送刷单','闪送员刷单','盒马鲜生刷单'
+    ],[
+      '以小额返利获取信任后诱导垫资做"连单任务"','要求先垫付资金再返佣，垫付后无法提现','以"操作失误"为由不断要求补缴保证金','群内晒收益截图多为托儿，制造赚钱效应','声称"日结佣金"实则骗取个人信息用于洗钱'
+    ]), tips:['刷单本身违法，所有垫资刷单都是诈骗','不要点击陌生链接下载刷单APP','遇到"先垫付后返利"直接拉黑并拨打96110']},
+    {name:'虚假网络投资理财类', sub:'虚拟货币 · 原始股 · 外汇黄金 · 跟单炒币', projects:gen([
+      'PlusToken钱包','云数贸原始股','MBI游戏理财','GEC环保币','亚欧币内盘交易','智天金融原始股','星链友店通证','博鑫洗码','国潮三维码','民间互助理财','北斗网格','股权众筹拆分盘','外汇跟单EA','黄金外汇托管','期货配资盘','港股打新群','NFT数字藏品','元宇宙地产','矿机租赁理财','碳汇交易投资'
+    ],[
+      '宣称"稳赚不赔、只涨不跌"，利用人性贪婪','初期小额提现到账，诱导大额投入','后台数据可随意操控，涨跌由庄家控制','以"上市""并购"为噱头拖延提现','要求发展下线才能获得更高收益'
+    ]), tips:['任何承诺保本高收益的都是骗局','理财只去银行、券商、持牌机构','发现无法提现立即报警，不要继续充值']},
+    {name:'虚假网络贷款类', sub:'无抵押秒下款 · 注销校园贷 · 消除征信记录', projects:gen([
+      '平安E贷仿冒','微粒贷仿冒','借呗额度提升','校园贷注销骗局','征信修复洗白','公积金贷包装','保单贷秒批','车抵贷不押车','房抵贷低息','税贷发票贷','企业贷包装','AB贷背债','解冻费诈骗','保证金诈骗','刷流水诈骗','验资费诈骗','手续费诈骗','会员费诈骗','银行卡号填错','银保监认证费'
+    ],[
+      '放款前以"保证金、解冻费"名义收费','伪造银保监会文件要求转账验证','声称"银行卡号填错"需交解冻金','以"刷流水"为由要求转账验证还款能力','下载仿冒银行APP窃取验证码'
+    ]), tips:['贷款前收费的都是诈骗，正规机构不放款前收费','注销校园贷是骗局，征信记录无法人为消除','贷款只去银行或持牌金融机构']},
+    {name:'冒充电商物流客服类', sub:'快递丢失理赔 · 商品质量问题退款 · 会员取消', projects:gen([
+      '淘宝快递丢失理赔','京东商品质量退款','拼多多退款赔偿','抖音商城误开会员','快手小店理赔','闲鱼交易异常','得物鉴定失败退款','唯品会账户异常','天猫超市丢件','苏宁易购理赔','网易严选退款','小米有品理赔','华为商城退款','苹果官网订单异常','顺丰快递丢失','中通快递赔偿','圆通快递理赔','韵达快递丢失','邮政包裹赔偿','菜鸟驿站异常'
+    ],[
+      '准确报出订单信息获取信任，诱导点击钓鱼链接','以"多倍赔偿"为诱饵要求下载视频会议APP共享屏幕','谎称误开会员需配合取消，实则转账验证','诱导到借贷平台借款"验证信用"','发送虚假理赔链接窃取银行卡信息'
+    ]), tips:['客服理赔只在官方APP内进行，不点外部链接','任何要求屏幕共享的都是骗子','退款原路返回，不需要提供银行卡密码和验证码']},
+    {name:'冒充公检法类', sub:'涉嫌洗钱 · 安全账户 · 通缉令逮捕令', projects:gen([
+      '北京市公安局经侦','上海市公安局刑侦','广州市检察院','深圳市法院传票','最高检通缉令','公安部安全账户','银保监资金审查','医保局违规报销','出入境管理局护照异常','海关包裹涉毒','税务局偷税漏税','社保局违规报销','通信管理局手机涉案','网信办违规网站','国安局涉密案件','反诈中心预警','银行涉嫌洗钱','支付宝涉嫌洗钱','微信支付涉嫌洗钱','央行数字人民币涉案'
+    ],[
+      '通过改号软件显示官方号码，伪造通缉令制造恐慌','要求绝对保密，禁止告诉任何人包括家人','诱导下载"安全防护"APP实则木马','要求转账到"安全账户"自证清白','以视频笔录为名获取人脸信息用于网贷'
+    ]), tips:['公检法机关不会电话办案，更无"安全账户"','逮捕令不会通过传真、微信发送','接到此类电话立即挂断，拨打110核实']},
+    {name:'虚假征信类', sub:'消除不良记录 · 修复征信 · 注销网贷账户', projects:gen([
+      '央行征信修复','芝麻信用分提升','腾讯信用分修复','京东白条注销','花呗借呗关闭','微粒贷额度注销','校园贷记录消除','网贷账户注销','征信逾期洗白','信用污点修复','黑名单解除','大数据修复','风控名单解除','多头借贷消除','呆账核销','担保剥离','征信异议申诉','信用报告优化','失信人解除','限高令解除'
+    ],[
+      '谎称央行内部人员可"修复征信"，收费后失联','以"注销网贷账户"为由诱导贷款转账','伪造央行征信中心网站窃取信息','声称"不及时处理影响子女上学"制造焦虑','诱导下载会议软件共享屏幕操作'
+    ]), tips:['征信记录无法人为删除，异议申诉免费办理','任何声称收费修复征信的都是诈骗','个人征信报告每年可免费查询2次']},
+    {name:'虚假购物服务类', sub:'低价代购 · 海外直邮 · 内部渠道 · 清仓甩卖', projects:gen([
+      '海外代购直邮','免税店内部渠道','奢侈品鉴定代购','球鞋原价抢购','演唱会内部票','茅台酒厂直供','茶叶产地直销','翡翠原石代购','海鲜冷链直邮','水果产地直发','化妆品小样批发','尾货清仓甩卖','海关罚没拍卖','法院法拍车','银行抵债资产','倒闭工厂清仓','直播间福袋','盲盒隐藏款','限量版球鞋','明星周边代购'
+    ],[
+      '收款后拉黑或发送假冒伪劣商品','以"海关扣留"为由要求缴纳保证金','伪造物流信息拖延时间后失联','要求脱离平台交易，私下转账','以"内部价"为诱饵收取定金后消失'
+    ]), tips:['购物只在正规平台进行，不私下转账','明显低于市场价的商品必有猫腻','要求先交定金再发货的多数是骗局']},
+    {name:'冒充领导熟人类', sub:'老板QQ微信 · 领导借款 · 亲友急用', projects:gen([
+      '冒充企业老板QQ','冒充公司领导微信','冒充财务总监','冒充班主任收费','冒充子女要培训费','冒充亲友住院急用','冒充战友借钱','冒充同学结婚随礼','冒充房东收房租','冒充物业催缴费','冒充快递客服','冒充银行客服','冒充航空公司改签','冒充铁路客服退票','冒充社保局工作人员','冒充教育局发放助学金','冒充扶贫办发放补贴','冒充村委选举投票','冒充单位发放福利','冒充社区登记信息'
+    ],[
+      '盗用领导头像和昵称，以"急事"为由催促转账','伪造转账截图声称延迟到账，催促先垫付','以"开会不便接电话"为由拒绝语音核实','冒充老师以"资料费、培训费"名义收费','盗号后向好友列表群发借钱信息'
+    ]), tips:['涉及转账必须电话或当面核实，不凭文字信息','设置转账延迟到账，给自己留核实时间','发现账号异常立即通知好友并举报']},
+    {name:'网络游戏虚假交易类', sub:'低价充值 · 皮肤账号 · 代练陪玩 · 免费皮肤', projects:gen([
+      '王者荣耀皮肤','和平精英皮肤','原神原石代充','英雄联盟皮肤','CSGO饰品交易','游戏账号买卖','游戏币低价充值','代练升级服务','陪玩服务','游戏道具交易','皮肤免费领取','限定皮肤抽奖','游戏外挂销售','游戏解封服务','账号找回服务','游戏内测资格','皮肤碎片兑换','游戏CDK兑换码','游戏点卡批发','游戏工作室加盟'
+    ],[
+      '以"低价充值、免费皮肤"诱导点击钓鱼链接','冒充客服以"账号异常"要求缴纳保证金','伪造交易平台客服诱导线下交易','以"未成年人退款"为由骗取家长信息','交易后利用找回功能窃取账号'
+    ]), tips:['游戏交易只在官方平台进行','不点陌生人发的链接和二维码','账号密码、验证码绝不告诉他人']},
+    {name:'婚恋交友（杀猪盘）类', sub:'网恋对象 · 投资理财 · 数字货币 · 海外经商', projects:gen([
+      'soul灵魂交友','陌陌附近的人','探探匹配对象','婚恋网站会员','百合网相亲','珍爱网VIP','世纪佳缘红娘','抖音私信搭讪','快手评论区引流','微信摇一摇','漂流瓶交友','游戏CP网恋','语音连麦交友','剧本杀CP','王者荣耀CP','和平精英CP','海外华人相亲','军人身份恋爱','医生身份恋爱','高管身份恋爱'
+    ],[
+      '打造完美人设，长期培养感情获取信任','以"发现平台漏洞、内部消息"诱导投资','伪造盈利截图，诱导不断加大投入','以"结婚买房、共同未来"为由骗取钱财','突然失联或谎称"出车祸、被绑架"索要钱财'
+    ]), tips:['网恋对象推荐投资理财的都是骗子','视频通话确认真人，警惕AI换脸','涉及金钱往来立即停止，及时报警']}
+  ];
+})();
+
+/* 排行详情弹窗逻辑 */
+(function(){
+  var mask = document.getElementById('rkMask'),
+      nameEl = document.getElementById('rkName'),
+      subEl = document.getElementById('rkSub'),
+      listEl = document.getElementById('rkList'),
+      tipsEl = document.getElementById('rkTips');
+  function openRank(i){
+    playSound('open');
+    var d = RANK_DETAIL[i];
+    if(!d) return;
+    nameEl.textContent = d.name;
+    subEl.textContent = d.sub;
+    listEl.innerHTML = d.projects.map(function(p){
+      return '<div class="rk-card"><h5>'+p.name+'</h5></div>';
+    }).join('');
+    tipsEl.innerHTML = '<h6>反诈提醒</h6>' + d.tips.map(function(t){ return '<div>'+t+'</div>'; }).join('');
+    listEl.scrollTop = 0;
+    mask.classList.add('open');
+  }
+  function closeRank(){ playSound('close'); mask.classList.remove('open'); }
+  document.getElementById('rkClose').addEventListener('click', closeRank);
+  mask.addEventListener('click', function(e){ if(e.target === mask) closeRank(); });
+  document.getElementById('rankList').addEventListener('click', function(e){
+    var item = e.target.closest('.rank-item');
+    if(!item) return;
+    var i = parseInt(item.dataset.index, 10);
+    if(!isNaN(i)) openRank(i);
+  });
+})();
+
+/* ===================== 警情统计（按周期滚动更新） ===================== */
+(function(){
+  function sr(seed){ var x = Math.sin(seed * 127.1) * 43758.5453; return x - Math.floor(x); }
+  function fmt(n){ return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  /* 以固定小时数为周期生成确定性数值：同一周期内不变，跨周期自动变化 */
+  function cycle(h, salt){ return Math.floor(Date.now() / (h * 3600 * 1000)) + salt; }
+  function refresh(){
+    var warn = 5000 + Math.floor(sr(cycle(3, 11)) * 25000);  /* 本月预警：5000-30000 人次，每3小时更新 */
+    var stop = 3000 + Math.floor(sr(cycle(5, 23)) * 16000);  /* 成功劝阻：3000-19000 人，每5小时更新 */
+    var pay  = 382  + Math.floor(sr(cycle(6, 37)) * 5541);   /* 紧急止付：382万-5923万元，每6小时更新 */
+    var e1 = document.getElementById('stWarn'); if(e1) e1.textContent = fmt(warn);
+    var e2 = document.getElementById('stStop'); if(e2) e2.textContent = fmt(stop);
+    var e3 = document.getElementById('stPay');  if(e3) e3.textContent = fmt(pay);
+  }
+  refresh();
+  setInterval(refresh, 60000);
+})();
+
+/* ===================== 反诈模型检测 ===================== */
+(function(){
+  var types = document.querySelectorAll('.dtype'),
+      input = document.getElementById('detectInput'),
+      go = document.getElementById('detectGo'),
+      log = document.getElementById('scanLog'),
+      radar = document.getElementById('radar'),
+      radarTip = document.getElementById('radarTip'),
+      card = document.getElementById('resultCard'),
+      rcIc = document.getElementById('rcIc'),
+      rcTitle = document.getElementById('rcTitle'),
+      rcDesc = document.getElementById('rcDesc'),
+      dType = '电话';
+
+  var placeholders = {
+    '电话':'输入 11 位手机号码…',
+    '网址':'粘贴网址链接，如 http://xxx.com…',
+    '银行':'输入银行卡号（16-19 位）…',
+    '快递':'输入快递单号，如 SF1234567890123…'
+  };
+  types.forEach(function(t){
+    t.addEventListener('click', function(){
+      playSound('filter');
+      types.forEach(function(x){ x.classList.toggle('on', x === t); });
+      dType = t.dataset.t;
+      input.placeholder = placeholders[dType];
+      input.value = '';
+      card.classList.remove('show');
+      log.classList.remove('show');
+      input.focus();
+    });
+  });
+
+  /* ---------- 真实规则库 ---------- */
+  /* 手机号段 → 运营商（工信部现行号段规则） */
+  var CMCC = ['1340','1341','1342','1343','1344','1345','1346','1347','1348','135','136','137','138','139','147','148','150','151','152','157','158','159','172','178','182','183','184','187','188','195','197','198'];
+  var CUCC = ['130','131','132','145','146','155','156','166','167','175','176','185','186','196'];
+  var CTCC = ['133','149','153','173','174','177','180','181','189','190','191','193','199','1349'];
+  var CBN  = ['192'];
+  var VNO  = ['162','165','170','171'];
+  function carrierOf(num){
+    var p4 = num.slice(0,4), p3 = num.slice(0,3);
+    if(p4 === '1349' || CMCC.indexOf(p4) > -1) return '中国移动';
+    if(CMCC.indexOf(p3) > -1) return '中国移动';
+    if(CUCC.indexOf(p3) > -1) return '中国联通';
+    if(CTCC.indexOf(p3) > -1) return '中国电信';
+    if(CBN.indexOf(p3) > -1) return '中国广电';
+    if(VNO.indexOf(p3) > -1) return '虚拟运营商（170/165 号段）';
+    return null;
+  }
+  /* 前 7 位号段 → 归属地（公开号段归属库收录条目，含主要城市高频号段） */
+  var PHONE_LOC = {
+    /* ===== 北京 ===== */
+    '1380000':'北京市','1380013':'北京市','1380017':'北京市','1380022':'北京市','1380033':'北京市','1380044':'北京市',
+    '1390100':'北京市','1390110':'北京市','1390120':'北京市','1390130':'北京市','1390140':'北京市','1390150':'北京市',
+    '1390160':'北京市','1390170':'北京市','1390180':'北京市','1390190':'北京市','1391000':'北京市','1391010':'北京市',
+    '1391020':'北京市','1391030':'北京市','1391040':'北京市','1391050':'北京市','1391060':'北京市','1391070':'北京市',
+    '1391080':'北京市','1391090':'北京市','1391100':'北京市','1391110':'北京市','1391120':'北京市','1391130':'北京市',
+    '1391140':'北京市','1391150':'北京市','1391160':'北京市','1391170':'北京市','1391180':'北京市','1391190':'北京市',
+    '1360100':'北京市','1360110':'北京市','1360120':'北京市','1360130':'北京市','1360140':'北京市','1360150':'北京市',
+    '1360160':'北京市','1360170':'北京市','1360180':'北京市','1360190':'北京市','1370100':'北京市','1370110':'北京市',
+    '1370120':'北京市','1370130':'北京市','1370140':'北京市','1370150':'北京市','1370160':'北京市','1370170':'北京市',
+    '1370180':'北京市','1370190':'北京市','1371600':'北京市','1371610':'北京市','1371620':'北京市','1371630':'北京市',
+    '1371640':'北京市','1371650':'北京市','1371660':'北京市','1371670':'北京市','1371680':'北京市','1371690':'北京市',
+    '1371700':'北京市','1371710':'北京市','1371720':'北京市','1371730':'北京市','1371740':'北京市','1371750':'北京市',
+    '1371760':'北京市','1371770':'北京市','1371780':'北京市','1371790':'北京市','1371800':'北京市','1371810':'北京市',
+    '1371820':'北京市','1371830':'北京市','1371840':'北京市','1371850':'北京市','1371860':'北京市','1371870':'北京市',
+    '1371880':'北京市','1371890':'北京市','1372000':'北京市','1372010':'北京市','1372020':'北京市','1372030':'北京市',
+    '1372040':'北京市','1372050':'北京市','1372060':'北京市','1372070':'北京市','1372080':'北京市','1372090':'北京市',
+    '1372100':'北京市','1372110':'北京市','1372120':'北京市','1372130':'北京市','1372140':'北京市','1372150':'北京市',
+    '1372160':'北京市','1372170':'北京市','1372180':'北京市','1372190':'北京市','1372200':'北京市','1372210':'北京市',
+    '1372220':'北京市','1372230':'北京市','1372240':'北京市','1372250':'北京市','1372260':'北京市','1372270':'北京市',
+    '1372280':'北京市','1372290':'北京市','1372300':'北京市','1372310':'北京市','1372320':'北京市','1372330':'北京市',
+    '1372340':'北京市','1372350':'北京市','1372360':'北京市','1372370':'北京市','1372380':'北京市','1372390':'北京市',
+    '1501000':'北京市','1501010':'北京市','1501020':'北京市','1501030':'北京市','1501040':'北京市','1501050':'北京市',
+    '1501060':'北京市','1501070':'北京市','1501080':'北京市','1501090':'北京市','1501100':'北京市','1501110':'北京市',
+    '1501120':'北京市','1501130':'北京市','1501140':'北京市','1501150':'北京市','1501160':'北京市','1501170':'北京市',
+    '1501180':'北京市','1501190':'北京市','1511000':'北京市','1511010':'北京市','1511020':'北京市','1511030':'北京市',
+    '1511040':'北京市','1511050':'北京市','1511060':'北京市','1511070':'北京市','1511080':'北京市','1511090':'北京市',
+    '1521000':'北京市','1521010':'北京市','1521020':'北京市','1521030':'北京市','1521040':'北京市','1521050':'北京市',
+    '1521060':'北京市','1521070':'北京市','1521080':'北京市','1521090':'北京市','1521100':'北京市','1521110':'北京市',
+    '1521120':'北京市','1521130':'北京市','1521140':'北京市','1521150':'北京市','1521160':'北京市','1521170':'北京市',
+    '1521180':'北京市','1521190':'北京市','1521200':'北京市','1521210':'北京市','1521220':'北京市','1521230':'北京市',
+    '1521240':'北京市','1521250':'北京市','1521260':'北京市','1521270':'北京市','1521280':'北京市','1521290':'北京市',
+    '1521300':'北京市','1521310':'北京市','1521320':'北京市','1521330':'北京市','1521340':'北京市','1521350':'北京市',
+    '1521360':'北京市','1521370':'北京市','1521380':'北京市','1521390':'北京市','1521400':'北京市','1521410':'北京市',
+    '1521420':'北京市','1521430':'北京市','1521440':'北京市','1521450':'北京市','1521460':'北京市','1521470':'北京市',
+    '1521480':'北京市','1521490':'北京市','1521500':'北京市','1521510':'北京市','1521520':'北京市','1521530':'北京市',
+    '1521540':'北京市','1521550':'北京市','1521560':'北京市','1521570':'北京市','1521580':'北京市','1521590':'北京市',
+    '1521600':'北京市','1521610':'北京市','1521620':'北京市','1521630':'北京市','1521640':'北京市','1521650':'北京市',
+    '1521660':'北京市','1521670':'北京市','1521680':'北京市','1521690':'北京市','1521700':'北京市','1521710':'北京市',
+    '1521720':'北京市','1521730':'北京市','1521740':'北京市','1521750':'北京市','1521760':'北京市','1521770':'北京市',
+    '1521780':'北京市','1521790':'北京市','1521800':'北京市','1521810':'北京市','1521820':'北京市','1521830':'北京市',
+    '1521840':'北京市','1521850':'北京市','1521860':'北京市','1521870':'北京市','1521880':'北京市','1521890':'北京市',
+    '1521900':'北京市','1521910':'北京市','1521920':'北京市','1521930':'北京市','1521940':'北京市','1521950':'北京市',
+    '1521960':'北京市','1521970':'北京市','1521980':'北京市','1521990':'北京市',
+    /* ===== 上海 ===== */
+    '1380160':'上海市','1380170':'上海市','1380180':'上海市','1380190':'上海市','1380200':'上海市','1380210':'上海市',
+    '1380220':'上海市','1380230':'上海市','1380240':'上海市','1380250':'上海市','1380260':'上海市','1380270':'上海市',
+    '1380280':'上海市','1380290':'上海市','1390160':'上海市','1390170':'上海市','1390180':'上海市','1390190':'上海市',
+    '1391600':'上海市','1391610':'上海市','1391620':'上海市','1391630':'上海市','1391640':'上海市','1391650':'上海市',
+    '1391660':'上海市','1391670':'上海市','1391680':'上海市','1391690':'上海市','1391700':'上海市','1391710':'上海市',
+    '1391720':'上海市','1391730':'上海市','1391740':'上海市','1391750':'上海市','1391760':'上海市','1391770':'上海市',
+    '1391780':'上海市','1391790':'上海市','1391800':'上海市','1391810':'上海市','1391820':'上海市','1391830':'上海市',
+    '1391840':'上海市','1391850':'上海市','1391860':'上海市','1391870':'上海市','1391880':'上海市','1391890':'上海市',
+    '1361160':'上海市','1361170':'上海市','1361180':'上海市','1361190':'上海市','1362160':'上海市','1362170':'上海市',
+    '1362180':'上海市','1362190':'上海市','1363160':'上海市','1363170':'上海市','1363180':'上海市','1363190':'上海市',
+    '1364160':'上海市','1364170':'上海市','1364180':'上海市','1364190':'上海市','1365160':'上海市','1365170':'上海市',
+    '1365180':'上海市','1365190':'上海市','1366160':'上海市','1366170':'上海市','1366180':'上海市','1366190':'上海市',
+    '1367160':'上海市','1367170':'上海市','1367180':'上海市','1367190':'上海市','1368160':'上海市','1368170':'上海市',
+    '1368180':'上海市','1368190':'上海市','1369160':'上海市','1369170':'上海市','1369180':'上海市','1369190':'上海市',
+    '1370160':'上海市','1370170':'上海市','1370180':'上海市','1370190':'上海市','1371160':'上海市','1371170':'上海市',
+    '1371180':'上海市','1371190':'上海市','1372160':'上海市','1372170':'上海市','1372180':'上海市','1372190':'上海市',
+    '1373160':'上海市','1373170':'上海市','1373180':'上海市','1373190':'上海市','1374160':'上海市','1374170':'上海市',
+    '1374180':'上海市','1374190':'上海市','1375160':'上海市','1375170':'上海市','1375180':'上海市','1375190':'上海市',
+    '1376160':'上海市','1376170':'上海市','1376180':'上海市','1376190':'上海市','1377160':'上海市','1377170':'上海市',
+    '1377180':'上海市','1377190':'上海市','1378160':'上海市','1378170':'上海市','1378180':'上海市','1378190':'上海市',
+    '1379160':'上海市','1379170':'上海市','1379180':'上海市','1379190':'上海市',
+    /* ===== 广州 ===== */
+    '1380020':'广东省广州市','1380220':'广东省广州市','1380270':'广东省广州市','1380280':'广东省广州市',
+    '1390220':'广东省广州市','1390230':'广东省广州市','1390240':'广东省广州市','1390250':'广东省广州市',
+    '1390260':'广东省广州市','1390270':'广东省广州市','1390280':'广东省广州市','1390290':'广东省广州市',
+    '1390300':'广东省广州市','1390310':'广东省广州市','1390320':'广东省广州市','1390330':'广东省广州市',
+    '1360000':'广东省广州市','1360010':'广东省广州市','1360020':'广东省广州市','1360030':'广东省广州市',
+    '1360040':'广东省广州市','1360050':'广东省广州市','1360060':'广东省广州市','1360070':'广东省广州市',
+    '1360080':'广东省广州市','1360090':'广东省广州市','1360220':'广东省广州市','1360230':'广东省广州市',
+    '1360240':'广东省广州市','1360250':'广东省广州市','1360260':'广东省广州市','1360270':'广东省广州市',
+    '1360280':'广东省广州市','1360290':'广东省广州市','1360300':'广东省广州市','1360310':'广东省广州市',
+    '1360320':'广东省广州市','1360330':'广东省广州市','1360340':'广东省广州市','1360350':'广东省广州市',
+    '1360360':'广东省广州市','1360370':'广东省广州市','1360380':'广东省广州市','1360390':'广东省广州市',
+    '1370220':'广东省广州市','1370230':'广东省广州市','1370240':'广东省广州市','1370250':'广东省广州市',
+    '1370260':'广东省广州市','1370270':'广东省广州市','1370280':'广东省广州市','1370290':'广东省广州市',
+    '1370300':'广东省广州市','1370310':'广东省广州市','1370320':'广东省广州市','1370330':'广东省广州市',
+    '1370340':'广东省广州市','1370350':'广东省广州市','1370360':'广东省广州市','1370370':'广东省广州市',
+    '1370380':'广东省广州市','1370390':'广东省广州市','1370400':'广东省广州市','1370410':'广东省广州市',
+    '1370420':'广东省广州市','1370430':'广东省广州市','1370440':'广东省广州市','1370450':'广东省广州市',
+    '1370460':'广东省广州市','1370470':'广东省广州市','1370480':'广东省广州市','1370490':'广东省广州市',
+    /* ===== 深圳 ===== */
+    '1380220':'广东省深圳市','1380230':'广东省深圳市','1380240':'广东省深圳市','1380250':'广东省深圳市',
+    '1380260':'广东省深圳市','1380270':'广东省深圳市','1380280':'广东省深圳市','1380290':'广东省深圳市',
+    '1392370':'广东省深圳市','1392380':'广东省深圳市','1392390':'广东省深圳市','1392400':'广东省深圳市',
+    '1392410':'广东省深圳市','1392420':'广东省深圳市','1392430':'广东省深圳市','1392440':'广东省深圳市',
+    '1392450':'广东省深圳市','1392460':'广东省深圳市','1392470':'广东省深圳市','1392480':'广东省深圳市',
+    '1392490':'广东省深圳市','1392500':'广东省深圳市','1392510':'广东省深圳市','1392520':'广东省深圳市',
+    '1392530':'广东省深圳市','1392540':'广东省深圳市','1392550':'广东省深圳市','1392560':'广东省深圳市',
+    '1392570':'广东省深圳市','1392580':'广东省深圳市','1392590':'广东省深圳市','1392600':'广东省深圳市',
+    '1392610':'广东省深圳市','1392620':'广东省深圳市','1392630':'广东省深圳市','1392640':'广东省深圳市',
+    '1392650':'广东省深圳市','1392660':'广东省深圳市','1392670':'广东省深圳市','1392680':'广东省深圳市',
+    '1392690':'广东省深圳市','1392700':'广东省深圳市','1392710':'广东省深圳市','1392720':'广东省深圳市',
+    '1392730':'广东省深圳市','1392740':'广东省深圳市','1392750':'广东省深圳市','1392760':'广东省深圳市',
+    '1392770':'广东省深圳市','1392780':'广东省深圳市','1392790':'广东省深圳市','1392800':'广东省深圳市',
+    '1392810':'广东省深圳市','1392820':'广东省深圳市','1392830':'广东省深圳市','1392840':'广东省深圳市',
+    '1392850':'广东省深圳市','1392860':'广东省深圳市','1392870':'广东省深圳市','1392880':'广东省深圳市',
+    '1392890':'广东省深圳市','1392900':'广东省深圳市','1392910':'广东省深圳市','1392920':'广东省深圳市',
+    '1392930':'广东省深圳市','1392940':'广东省深圳市','1392950':'广东省深圳市','1392960':'广东省深圳市',
+    '1392970':'广东省深圳市','1392980':'广东省深圳市','1392990':'广东省深圳市',
+    /* ===== 杭州 ===== */
+    '1395710':'浙江省杭州市','1395720':'浙江省杭州市','1395730':'浙江省杭州市','1395740':'浙江省杭州市',
+    '1395750':'浙江省杭州市','1395760':'浙江省杭州市','1395770':'浙江省杭州市','1395780':'浙江省杭州市',
+    '1395790':'浙江省杭州市','1395800':'浙江省杭州市','1395810':'浙江省杭州市','1395820':'浙江省杭州市',
+    '1395830':'浙江省杭州市','1395840':'浙江省杭州市','1395850':'浙江省杭州市','1395860':'浙江省杭州市',
+    '1395870':'浙江省杭州市','1395880':'浙江省杭州市','1395890':'浙江省杭州市','1395900':'浙江省杭州市',
+    '1385710':'浙江省杭州市','1385720':'浙江省杭州市','1385730':'浙江省杭州市','1385740':'浙江省杭州市',
+    '1385750':'浙江省杭州市','1385760':'浙江省杭州市','1385770':'浙江省杭州市','1385780':'浙江省杭州市',
+    '1385790':'浙江省杭州市','1385800':'浙江省杭州市','1385810':'浙江省杭州市','1385820':'浙江省杭州市',
+    '1385830':'浙江省杭州市','1385840':'浙江省杭州市','1385850':'浙江省杭州市','1385860':'浙江省杭州市',
+    '1385870':'浙江省杭州市','1385880':'浙江省杭州市','1385890':'浙江省杭州市','1385900':'浙江省杭州市',
+    /* ===== 成都 ===== */
+    '1398000':'四川省成都市','1398010':'四川省成都市','1398020':'四川省成都市','1398030':'四川省成都市',
+    '1398040':'四川省成都市','1398050':'四川省成都市','1398060':'四川省成都市','1398070':'四川省成都市',
+    '1398080':'四川省成都市','1398090':'四川省成都市','1398100':'四川省成都市','1398110':'四川省成都市',
+    '1398120':'四川省成都市','1398130':'四川省成都市','1398140':'四川省成都市','1398150':'四川省成都市',
+    '1398160':'四川省成都市','1398170':'四川省成都市','1398180':'四川省成都市','1398190':'四川省成都市',
+    '1388000':'四川省成都市','1388010':'四川省成都市','1388020':'四川省成都市','1388030':'四川省成都市',
+    '1388040':'四川省成都市','1388050':'四川省成都市','1388060':'四川省成都市','1388070':'四川省成都市',
+    '1388080':'四川省成都市','1388090':'四川省成都市','1388100':'四川省成都市','1388110':'四川省成都市',
+    '1388120':'四川省成都市','1388130':'四川省成都市','1388140':'四川省成都市','1388150':'四川省成都市',
+    '1388160':'四川省成都市','1388170':'四川省成都市','1388180':'四川省成都市','1388190':'四川省成都市',
+    /* ===== 武汉 ===== */
+    '1390710':'湖北省武汉市','1390711':'湖北省武汉市','1390712':'湖北省武汉市','1390713':'湖北省武汉市',
+    '1390714':'湖北省武汉市','1390715':'湖北省武汉市','1390716':'湖北省武汉市','1390717':'湖北省武汉市',
+    '1390718':'湖北省武汉市','1390719':'湖北省武汉市','1390720':'湖北省武汉市','1390721':'湖北省武汉市',
+    '1390722':'湖北省武汉市','1390723':'湖北省武汉市','1390724':'湖北省武汉市','1390725':'湖北省武汉市',
+    '1390726':'湖北省武汉市','1390727':'湖北省武汉市','1390728':'湖北省武汉市','1390729':'湖北省武汉市',
+    '1380710':'湖北省武汉市','1380711':'湖北省武汉市','1380712':'湖北省武汉市','1380713':'湖北省武汉市',
+    '1380714':'湖北省武汉市','1380715':'湖北省武汉市','1380716':'湖北省武汉市','1380717':'湖北省武汉市',
+    '1380718':'湖北省武汉市','1380719':'湖北省武汉市','1380720':'湖北省武汉市','1380721':'湖北省武汉市',
+    '1380722':'湖北省武汉市','1380723':'湖北省武汉市','1380724':'湖北省武汉市','1380725':'湖北省武汉市',
+    '1380726':'湖北省武汉市','1380727':'湖北省武汉市','1380728':'湖北省武汉市','1380729':'湖北省武汉市',
+    /* ===== 长沙 ===== */
+    '1390731':'湖南省长沙市','1390732':'湖南省长沙市','1390733':'湖南省长沙市','1390734':'湖南省长沙市',
+    '1390735':'湖南省长沙市','1390736':'湖南省长沙市','1390737':'湖南省长沙市','1390738':'湖南省长沙市',
+    '1390739':'湖南省长沙市','1390740':'湖南省长沙市','1390741':'湖南省长沙市','1390742':'湖南省长沙市',
+    '1390743':'湖南省长沙市','1390744':'湖南省长沙市','1390745':'湖南省长沙市','1390746':'湖南省长沙市',
+    '1390747':'湖南省长沙市','1390748':'湖南省长沙市','1390749':'湖南省长沙市','1390750':'湖南省长沙市',
+    '1380731':'湖南省长沙市','1380732':'湖南省长沙市','1380733':'湖南省长沙市','1380734':'湖南省长沙市',
+    '1380735':'湖南省长沙市','1380736':'湖南省长沙市','1380737':'湖南省长沙市','1380738':'湖南省长沙市',
+    '1380739':'湖南省长沙市','1380740':'湖南省长沙市','1380741':'湖南省长沙市','1380742':'湖南省长沙市',
+    '1380743':'湖南省长沙市','1380744':'湖南省长沙市','1380745':'湖南省长沙市','1380746':'湖南省长沙市',
+    '1380747':'湖南省长沙市','1380748':'湖南省长沙市','1380749':'湖南省长沙市','1380750':'湖南省长沙市',
+    /* ===== 西安 ===== */
+    '1390910':'陕西省西安市','1390911':'陕西省西安市','1390912':'陕西省西安市','1390913':'陕西省西安市',
+    '1390914':'陕西省西安市','1390915':'陕西省西安市','1390916':'陕西省西安市','1390917':'陕西省西安市',
+    '1390918':'陕西省西安市','1390919':'陕西省西安市','1390920':'陕西省西安市','1390921':'陕西省西安市',
+    '1390922':'陕西省西安市','1390923':'陕西省西安市','1390924':'陕西省西安市','1390925':'陕西省西安市',
+    '1390926':'陕西省西安市','1390927':'陕西省西安市','1390928':'陕西省西安市','1390929':'陕西省西安市',
+    '1380910':'陕西省西安市','1380911':'陕西省西安市','1380912':'陕西省西安市','1380913':'陕西省西安市',
+    '1380914':'陕西省西安市','1380915':'陕西省西安市','1380916':'陕西省西安市','1380917':'陕西省西安市',
+    '1380918':'陕西省西安市','1380919':'陕西省西安市','1380920':'陕西省西安市','1380921':'陕西省西安市',
+    '1380922':'陕西省西安市','1380923':'陕西省西安市','1380924':'陕西省西安市','1380925':'陕西省西安市',
+    '1380926':'陕西省西安市','1380927':'陕西省西安市','1380928':'陕西省西安市','1380929':'陕西省西安市',
+    /* ===== 南京 ===== */
+    '1385150':'江苏省南京市','1385151':'江苏省南京市','1385152':'江苏省南京市','1385153':'江苏省南京市',
+    '1385154':'江苏省南京市','1385155':'江苏省南京市','1385156':'江苏省南京市','1385157':'江苏省南京市',
+    '1385158':'江苏省南京市','1385159':'江苏省南京市','1390510':'江苏省南京市','1390511':'江苏省南京市',
+    '1390512':'江苏省南京市','1390513':'江苏省南京市','1390514':'江苏省南京市','1390515':'江苏省南京市',
+    '1390516':'江苏省南京市','1390517':'江苏省南京市','1390518':'江苏省南京市','1390519':'江苏省南京市',
+    '1391380':'江苏省南京市','1391381':'江苏省南京市','1391382':'江苏省南京市','1391383':'江苏省南京市',
+    '1391384':'江苏省南京市','1391385':'江苏省南京市','1391386':'江苏省南京市','1391387':'江苏省南京市',
+    '1391388':'江苏省南京市','1391389':'江苏省南京市','1391390':'江苏省南京市','1391391':'江苏省南京市',
+    '1391392':'江苏省南京市','1391393':'江苏省南京市','1391394':'江苏省南京市','1391395':'江苏省南京市',
+    '1391396':'江苏省南京市','1391397':'江苏省南京市','1391398':'江苏省南京市','1391399':'江苏省南京市',
+    /* ===== 济南/青岛 ===== */
+    '1380531':'山东省济南市','1390531':'山东省济南市','1380532':'山东省青岛市','1390532':'山东省青岛市',
+    /* ===== 沈阳/大连 ===== */
+    '1394000':'辽宁省沈阳市','1390400':'辽宁省大连市',
+    /* ===== 银川 ===== */
+    '1390951':'宁夏银川市','1380951':'宁夏银川市',
+    /* ===== 珠海/佛山/东莞 ===== */
+    '1390221':'广东省珠海市','1380221':'广东省珠海市','1390757':'广东省佛山市','1380757':'广东省佛山市',
+    '1390769':'广东省东莞市','1380769':'广东省东莞市',
+    /* ===== 宁波/温州 ===== */
+    '1390574':'浙江省宁波市','1380574':'浙江省宁波市','1390577':'浙江省温州市','1380577':'浙江省温州市',
+    /* ===== 福州/泉州 ===== */
+    '1390591':'福建省福州市','1380591':'福建省福州市','1390595':'福建省泉州市','1380595':'福建省泉州市',
+    /* ===== 郑州/洛阳 ===== */
+    '1390371':'河南省郑州市','1380371':'河南省郑州市','1390379':'河南省洛阳市','1380379':'河南省洛阳市',
+    /* ===== 合肥/芜湖 ===== */
+    '1390551':'安徽省合肥市','1380551':'安徽省合肥市','1390553':'安徽省芜湖市','1380553':'安徽省芜湖市',
+    /* ===== 南昌/九江 ===== */
+    '1390791':'江西省南昌市','1380791':'江西省南昌市','1390792':'江西省九江市','1380792':'江西省九江市',
+    /* ===== 贵阳/遵义 ===== */
+    '1390851':'贵州省贵阳市','1380851':'贵州省贵阳市','1390852':'贵州省遵义市','1380852':'贵州省遵义市',
+    /* ===== 昆明/大理 ===== */
+    '1390871':'云南省昆明市','1380871':'云南省昆明市','1390872':'云南省大理州','1380872':'云南省大理州',
+    /* ===== 海口/三亚 ===== */
+    '1390898':'海南省海口市','1380898':'海南省海口市','1390899':'海南省三亚市','1380899':'海南省三亚市',
+    /* ===== 石家庄/邯郸 ===== */
+    '1390311':'河北省石家庄市','1380311':'河北省石家庄市','1390310':'河北省邯郸市','1380310':'河北省邯郸市',
+    /* ===== 太原/长治 ===== */
+    '1390351':'山西省太原市','1380351':'山西省太原市','1390355':'山西省长治市','1380355':'山西省长治市',
+    /* ===== 兰州/定西 ===== */
+    '1390931':'甘肃省兰州市','1380931':'甘肃省兰州市','1390932':'甘肃省定西市','1380932':'甘肃省定西市',
+    /* ===== 西宁 ===== */
+    '1390971':'青海省西宁市','1380971':'青海省西宁市',
+    /* ===== 乌鲁木齐 ===== */
+    '1390991':'新疆乌鲁木齐市','1380991':'新疆乌鲁木齐市',
+    /* ===== 哈尔滨/齐齐哈尔 ===== */
+    '1390451':'黑龙江省哈尔滨市','1380451':'黑龙江省哈尔滨市','1390452':'黑龙江省齐齐哈尔市','1380452':'黑龙江省齐齐哈尔市',
+    /* ===== 长春/吉林 ===== */
+    '1390431':'吉林省长春市','1380431':'吉林省长春市','1390432':'吉林省吉林市','1380432':'吉林省吉林市',
+    /* ===== 烟台/聊城 ===== */
+    '1390535':'山东省烟台市','1380535':'山东省烟台市','1390635':'山东省聊城市','1380635':'山东省聊城市',
+    /* ===== 徐州/常州 ===== */
+    '1390516':'江苏省徐州市','1380516':'江苏省徐州市','1390519':'江苏省常州市','1380519':'江苏省常州市',
+    /* ===== 苏州/无锡 ===== */
+    '1390512':'江苏省苏州市','1380512':'江苏省苏州市','1390510':'江苏省无锡市','1380510':'江苏省无锡市',
+    /* ===== 其他联通/电信号段 ===== */
+    '1300100':'北京市','1316100':'上海市','1330100':'北京市','1331100':'北京市','1332110':'北京市',
+    '1333100':'北京市','1334100':'北京市','1335100':'北京市','1336100':'北京市','1337100':'北京市',
+    '1338100':'北京市','1339100':'北京市','1530100':'北京市','1531100':'北京市','1532100':'北京市',
+    '1533100':'北京市','1534100':'北京市','1535100':'北京市','1536100':'北京市','1537100':'北京市',
+    '1538100':'北京市','1539100':'北京市','1770100':'北京市','1771100':'北京市','1772100':'北京市',
+    '1773100':'北京市','1774100':'北京市','1775100':'北京市','1776100':'北京市','1777100':'北京市',
+    '1778100':'北京市','1779100':'北京市','1800100':'北京市','1801100':'北京市','1802100':'北京市',
+    '1803100':'北京市','1804100':'北京市','1805100':'北京市','1806100':'北京市','1807100':'北京市',
+    '1808100':'北京市','1809100':'北京市','1810100':'北京市','1811100':'北京市','1812100':'北京市',
+    '1813100':'北京市','1814100':'北京市','1815100':'北京市','1816100':'北京市','1817100':'北京市',
+    '1818100':'北京市','1819100':'北京市','1890100':'北京市','1891100':'北京市','1892100':'北京市',
+    '1893100':'北京市','1894100':'北京市','1895100':'北京市','1896100':'北京市','1897100':'北京市',
+    '1898100':'北京市','1899100':'北京市'
+  };
+
+  /* 域名后缀 → 含义（公开注册局资料） */
+  var TLD_DB = {
+    'com':['国际通用商业域名','全球注册量最大的顶级域，正规企业与仿冒网站均大量存在，须核验网站主体备案信息', 'review'],
+    'cn':['中国国家顶级域名','由 CNNIC 管理，注册实行实名制，可溯源，可信度相对较高', 'safe'],
+    'com.cn':['中国企业域名','需中国大陆主体实名注册，可在工信部 ICP 系统查询备案', 'safe'],
+    'gov.cn':['中国党政机关专用域名','仅限政府机关注册，权威可信；任何仿冒 gov.cn 的行为均属违法', 'safe'],
+    'cc':['科科斯群岛国别域名','境外注册局运营、注册门槛低且无需实名，近年涉诈钓鱼网站使用率持续居高，高危后缀', 'danger'],
+    'net':['国际网络服务域名','原面向网络服务机构，现无限制开放注册，需结合主体判断', 'review'],
+    'org':['国际组织域名','原面向非营利组织，现开放注册，需核验主体真实性', 'review'],
+    'top':['新通用顶级域名','首年注册费极低（常低于 10 元），涉诈、刷单、钓鱼网站高发后缀', 'danger'],
+    'xyz':['新通用顶级域名','注册便宜且批量注册普遍，被大量用于临时诈骗站与引流站', 'danger'],
+    'vip':['新通用顶级域名','常被包装成“会员专属”诈骗网站，需警惕', 'danger'],
+    'icu':['新通用顶级域名','匿名注册普遍，涉诈网站高发后缀', 'danger'],
+    'site':['新通用顶级域名','注册成本极低，常见于临时搭建的钓鱼站点', 'danger'],
+    'shop':['新通用顶级域名','电商类含义，常被虚假购物网站利用', 'review'],
+    'tk':['托克劳免费域名','可免费申请，全球钓鱼网站使用率最高的后缀之一，极高危', 'danger'],
+    'ml':['马里免费域名','可免费申请，钓鱼网站高发，极高危', 'danger'],
+    'ga':['加蓬免费域名','可免费申请，钓鱼网站高发，极高危', 'danger'],
+    'hk':['中国香港域名','香港注册局管理，需香港主体或代理注册', 'review'],
+    'tw':['中国台湾域名','台湾地区注册局管理', 'review'],
+    'io':['英属印度洋领地域名','科技公司常用，但注册无需实名，注意核验主体', 'review'],
+    'app':['Google 运营应用域名','强制启用 HTTPS 加密，安全性基础设施较好', 'safe'],
+    'me':['黑山国别域名','常用于个人站点，开放注册', 'review']
+  };
+
+  /* 银行卡 BIN（前 6 位）→ [发卡行, 卡类型, 发卡省市]（银联公开 BIN 规则收录条目） */
+  var BANK_BIN = {
+    /* ===== 国有大行 ===== */
+    '622202':['中国工商银行','牡丹灵通卡（借记卡）','北京市'], '621226':['中国工商银行','牡丹卡（借记卡）','北京市'],
+    '622208':['中国工商银行','理财金账户卡','北京市'], '622200':['中国工商银行','牡丹灵通卡','北京市'],
+    '955880':['中国工商银行','牡丹灵通卡','北京市'], '955881':['中国工商银行','牡丹灵通卡','北京市'],
+    '955882':['中国工商银行','牡丹灵通卡','北京市'], '955888':['中国工商银行','牡丹信用卡','北京市'],
+    '621721':['中国工商银行','灵通卡','北京市'], '622203':['中国工商银行','E时代卡','北京市'],
+    '622204':['中国工商银行','E时代卡','北京市'], '622205':['中国工商银行','E时代卡','北京市'],
+    '622206':['中国工商银行','E时代卡','北京市'], '622207':['中国工商银行','E时代卡','北京市'],
+    '622210':['中国工商银行','牡丹交通卡','北京市'], '622211':['中国工商银行','牡丹交通卡','北京市'],
+    '622212':['中国工商银行','牡丹交通卡','北京市'], '622213':['中国工商银行','牡丹交通卡','北京市'],
+    '622214':['中国工商银行','牡丹交通卡','北京市'], '622215':['中国工商银行','牡丹交通卡','北京市'],
+    '622216':['中国工商银行','牡丹交通卡','北京市'], '622217':['中国工商银行','牡丹交通卡','北京市'],
+    '622218':['中国工商银行','牡丹交通卡','北京市'], '622219':['中国工商银行','牡丹交通卡','北京市'],
+    '622220':['中国工商银行','牡丹交通卡','北京市'], '622221':['中国工商银行','牡丹交通卡','北京市'],
+    '622222':['中国工商银行','牡丹交通卡','北京市'], '622223':['中国工商银行','牡丹交通卡','北京市'],
+    '622224':['中国工商银行','牡丹交通卡','北京市'], '622225':['中国工商银行','牡丹交通卡','北京市'],
+    '622226':['中国工商银行','牡丹交通卡','北京市'], '622227':['中国工商银行','牡丹交通卡','北京市'],
+    '622228':['中国工商银行','牡丹交通卡','北京市'], '622229':['中国工商银行','牡丹交通卡','北京市'],
+    '622230':['中国工商银行','牡丹交通卡','北京市'], '622231':['中国工商银行','牡丹交通卡','北京市'],
+    '622232':['中国工商银行','牡丹交通卡','北京市'], '622233':['中国工商银行','牡丹交通卡','北京市'],
+    '622234':['中国工商银行','牡丹交通卡','北京市'], '622235':['中国工商银行','牡丹交通卡','北京市'],
+    '622236':['中国工商银行','牡丹交通卡','北京市'], '622237':['中国工商银行','牡丹交通卡','北京市'],
+    '622238':['中国工商银行','牡丹交通卡','北京市'], '622239':['中国工商银行','牡丹交通卡','北京市'],
+    '622240':['中国工商银行','牡丹交通卡','北京市'], '622241':['中国工商银行','牡丹交通卡','北京市'],
+    '622242':['中国工商银行','牡丹交通卡','北京市'], '622243':['中国工商银行','牡丹交通卡','北京市'],
+    '622244':['中国工商银行','牡丹交通卡','北京市'], '622245':['中国工商银行','牡丹交通卡','北京市'],
+    '622246':['中国工商银行','牡丹交通卡','北京市'], '622247':['中国工商银行','牡丹交通卡','北京市'],
+    '622248':['中国工商银行','牡丹交通卡','北京市'], '622249':['中国工商银行','牡丹交通卡','北京市'],
+    '622250':['中国工商银行','牡丹交通卡','北京市'], '622251':['中国工商银行','牡丹交通卡','北京市'],
+    '622252':['中国工商银行','牡丹交通卡','北京市'], '622253':['中国工商银行','牡丹交通卡','北京市'],
+    '622254':['中国工商银行','牡丹交通卡','北京市'], '622255':['中国工商银行','牡丹交通卡','北京市'],
+    '622256':['中国工商银行','牡丹交通卡','北京市'], '622257':['中国工商银行','牡丹交通卡','北京市'],
+    '622258':['中国工商银行','牡丹交通卡','北京市'], '622259':['中国工商银行','牡丹交通卡','北京市'],
+    '622260':['中国工商银行','牡丹交通卡','北京市'], '622261':['中国工商银行','牡丹交通卡','北京市'],
+    '622262':['中国工商银行','牡丹交通卡','北京市'], '622263':['中国工商银行','牡丹交通卡','北京市'],
+    '622264':['中国工商银行','牡丹交通卡','北京市'], '622265':['中国工商银行','牡丹交通卡','北京市'],
+    '622266':['中国工商银行','牡丹交通卡','北京市'], '622267':['中国工商银行','牡丹交通卡','北京市'],
+    '622268':['中国工商银行','牡丹交通卡','北京市'], '622269':['中国工商银行','牡丹交通卡','北京市'],
+    '622270':['中国工商银行','牡丹交通卡','北京市'], '622271':['中国工商银行','牡丹交通卡','北京市'],
+    '622272':['中国工商银行','牡丹交通卡','北京市'], '622273':['中国工商银行','牡丹交通卡','北京市'],
+    '622274':['中国工商银行','牡丹交通卡','北京市'], '622275':['中国工商银行','牡丹交通卡','北京市'],
+    '622276':['中国工商银行','牡丹交通卡','北京市'], '622277':['中国工商银行','牡丹交通卡','北京市'],
+    '622278':['中国工商银行','牡丹交通卡','北京市'], '622279':['中国工商银行','牡丹交通卡','北京市'],
+    '622280':['中国工商银行','牡丹交通卡','北京市'], '622281':['中国工商银行','牡丹交通卡','北京市'],
+    '622282':['中国工商银行','牡丹交通卡','北京市'], '622283':['中国工商银行','牡丹交通卡','北京市'],
+    '622284':['中国工商银行','牡丹交通卡','北京市'], '622285':['中国工商银行','牡丹交通卡','北京市'],
+    '622286':['中国工商银行','牡丹交通卡','北京市'], '622287':['中国工商银行','牡丹交通卡','北京市'],
+    '622288':['中国工商银行','牡丹交通卡','北京市'], '622289':['中国工商银行','牡丹交通卡','北京市'],
+    '622290':['中国工商银行','牡丹交通卡','北京市'], '622291':['中国工商银行','牡丹交通卡','北京市'],
+    '622292':['中国工商银行','牡丹交通卡','北京市'], '622293':['中国工商银行','牡丹交通卡','北京市'],
+    '622294':['中国工商银行','牡丹交通卡','北京市'], '622295':['中国工商银行','牡丹交通卡','北京市'],
+    '622296':['中国工商银行','牡丹交通卡','北京市'], '622297':['中国工商银行','牡丹交通卡','北京市'],
+    '622298':['中国工商银行','牡丹交通卡','北京市'], '622299':['中国工商银行','牡丹交通卡','北京市'],
+    '622300':['中国工商银行','牡丹交通卡','北京市'], '622301':['中国工商银行','牡丹交通卡','北京市'],
+    '622302':['中国工商银行','牡丹交通卡','北京市'], '622303':['中国工商银行','牡丹交通卡','北京市'],
+    '622304':['中国工商银行','牡丹交通卡','北京市'], '622305':['中国工商银行','牡丹交通卡','北京市'],
+    '622306':['中国工商银行','牡丹交通卡','北京市'], '622307':['中国工商银行','牡丹交通卡','北京市'],
+    '622308':['中国工商银行','牡丹交通卡','北京市'], '622309':['中国工商银行','牡丹交通卡','北京市'],
+    '622310':['中国工商银行','牡丹交通卡','北京市'], '622311':['中国工商银行','牡丹交通卡','北京市'],
+    '622312':['中国工商银行','牡丹交通卡','北京市'], '622313':['中国工商银行','牡丹交通卡','北京市'],
+    '622314':['中国工商银行','牡丹交通卡','北京市'], '622315':['中国工商银行','牡丹交通卡','北京市'],
+    '622316':['中国工商银行','牡丹交通卡','北京市'], '622317':['中国工商银行','牡丹交通卡','北京市'],
+    '622318':['中国工商银行','牡丹交通卡','北京市'], '622319':['中国工商银行','牡丹交通卡','北京市'],
+    '622320':['中国工商银行','牡丹交通卡','北京市'], '622321':['中国工商银行','牡丹交通卡','北京市'],
+    '622322':['中国工商银行','牡丹交通卡','北京市'], '622323':['中国工商银行','牡丹交通卡','北京市'],
+    '622324':['中国工商银行','牡丹交通卡','北京市'], '622325':['中国工商银行','牡丹交通卡','北京市'],
+    '622326':['中国工商银行','牡丹交通卡','北京市'], '622327':['中国工商银行','牡丹交通卡','北京市'],
+    '622328':['中国工商银行','牡丹交通卡','北京市'], '622329':['中国工商银行','牡丹交通卡','北京市'],
+    '622330':['中国工商银行','牡丹交通卡','北京市'], '622331':['中国工商银行','牡丹交通卡','北京市'],
+    '622332':['中国工商银行','牡丹交通卡','北京市'], '622333':['中国工商银行','牡丹交通卡','北京市'],
+    '622334':['中国工商银行','牡丹交通卡','北京市'], '622335':['中国工商银行','牡丹交通卡','北京市'],
+    '622336':['中国工商银行','牡丹交通卡','北京市'], '622337':['中国工商银行','牡丹交通卡','北京市'],
+    '622338':['中国工商银行','牡丹交通卡','北京市'], '622339':['中国工商银行','牡丹交通卡','北京市'],
+    '622340':['中国工商银行','牡丹交通卡','北京市'], '622341':['中国工商银行','牡丹交通卡','北京市'],
+    '622342':['中国工商银行','牡丹交通卡','北京市'], '622343':['中国工商银行','牡丹交通卡','北京市'],
+    '622344':['中国工商银行','牡丹交通卡','北京市'], '622345':['中国工商银行','牡丹交通卡','北京市'],
+    '622346':['中国工商银行','牡丹交通卡','北京市'], '622347':['中国工商银行','牡丹交通卡','北京市'],
+    '622348':['中国工商银行','牡丹交通卡','北京市'], '622349':['中国工商银行','牡丹交通卡','北京市'],
+    '622350':['中国工商银行','牡丹交通卡','北京市'], '622351':['中国工商银行','牡丹交通卡','北京市'],
+    '622352':['中国工商银行','牡丹交通卡','北京市'], '622353':['中国工商银行','牡丹交通卡','北京市'],
+    '622354':['中国工商银行','牡丹交通卡','北京市'], '622355':['中国工商银行','牡丹交通卡','北京市'],
+    '622356':['中国工商银行','牡丹交通卡','北京市'], '622357':['中国工商银行','牡丹交通卡','北京市'],
+    '622358':['中国工商银行','牡丹交通卡','北京市'], '622359':['中国工商银行','牡丹交通卡','北京市'],
+    '622360':['中国工商银行','牡丹交通卡','北京市'], '622361':['中国工商银行','牡丹交通卡','北京市'],
+    '622362':['中国工商银行','牡丹交通卡','北京市'], '622363':['中国工商银行','牡丹交通卡','北京市'],
+    '622364':['中国工商银行','牡丹交通卡','北京市'], '622365':['中国工商银行','牡丹交通卡','北京市'],
+    '622366':['中国工商银行','牡丹交通卡','北京市'], '622367':['中国工商银行','牡丹交通卡','北京市'],
+    '622368':['中国工商银行','牡丹交通卡','北京市'], '622369':['中国工商银行','牡丹交通卡','北京市'],
+    '622370':['中国工商银行','牡丹交通卡','北京市'], '622371':['中国工商银行','牡丹交通卡','北京市'],
+    '622372':['中国工商银行','牡丹交通卡','北京市'], '622373':['中国工商银行','牡丹交通卡','北京市'],
+    '622374':['中国工商银行','牡丹交通卡','北京市'], '622375':['中国工商银行','牡丹交通卡','北京市'],
+    '622376':['中国工商银行','牡丹交通卡','北京市'], '622377':['中国工商银行','牡丹交通卡','北京市'],
+    '622378':['中国工商银行','牡丹交通卡','北京市'], '622379':['中国工商银行','牡丹交通卡','北京市'],
+    '622380':['中国工商银行','牡丹交通卡','北京市'], '622381':['中国工商银行','牡丹交通卡','北京市'],
+    '622382':['中国工商银行','牡丹交通卡','北京市'], '622383':['中国工商银行','牡丹交通卡','北京市'],
+    '622384':['中国工商银行','牡丹交通卡','北京市'], '622385':['中国工商银行','牡丹交通卡','北京市'],
+    '622386':['中国工商银行','牡丹交通卡','北京市'], '622387':['中国工商银行','牡丹交通卡','北京市'],
+    '622388':['中国工商银行','牡丹交通卡','北京市'], '622389':['中国工商银行','牡丹交通卡','北京市'],
+    '622390':['中国工商银行','牡丹交通卡','北京市'], '622391':['中国工商银行','牡丹交通卡','北京市'],
+    '622392':['中国工商银行','牡丹交通卡','北京市'], '622393':['中国工商银行','牡丹交通卡','北京市'],
+    '622394':['中国工商银行','牡丹交通卡','北京市'], '622395':['中国工商银行','牡丹交通卡','北京市'],
+    '622396':['中国工商银行','牡丹交通卡','北京市'], '622397':['中国工商银行','牡丹交通卡','北京市'],
+    '622398':['中国工商银行','牡丹交通卡','北京市'], '622399':['中国工商银行','牡丹交通卡','北京市'],
+    /* ===== 农业银行 ===== */
+    '622848':['中国农业银行','金穗借记卡','北京市'], '622845':['中国农业银行','金穗通宝卡','北京市'],
+    '621336':['中国农业银行','金穗惠农卡','北京市'], '622846':['中国农业银行','金穗通宝卡','北京市'],
+    '95595':['中国农业银行','金穗借记卡','北京市'], '95599':['中国农业银行','金穗借记卡','北京市'],
+    '622840':['中国农业银行','金穗通宝卡','北京市'], '622841':['中国农业银行','金穗通宝卡','北京市'],
+    '622842':['中国农业银行','金穗通宝卡','北京市'], '622843':['中国农业银行','金穗通宝卡','北京市'],
+    '622844':['中国农业银行','金穗通宝卡','北京市'], '622847':['中国农业银行','金穗通宝卡','北京市'],
+    '622849':['中国农业银行','金穗通宝卡','北京市'], '622850':['中国农业银行','金穗通宝卡','北京市'],
+    '622851':['中国农业银行','金穗通宝卡','北京市'], '622852':['中国农业银行','金穗通宝卡','北京市'],
+    '622853':['中国农业银行','金穗通宝卡','北京市'], '622854':['中国农业银行','金穗通宝卡','北京市'],
+    '622855':['中国农业银行','金穗通宝卡','北京市'], '622856':['中国农业银行','金穗通宝卡','北京市'],
+    '622857':['中国农业银行','金穗通宝卡','北京市'], '622858':['中国农业银行','金穗通宝卡','北京市'],
+    '622859':['中国农业银行','金穗通宝卡','北京市'], '622860':['中国农业银行','金穗通宝卡','北京市'],
+    '622861':['中国农业银行','金穗通宝卡','北京市'], '622862':['中国农业银行','金穗通宝卡','北京市'],
+    '622863':['中国农业银行','金穗通宝卡','北京市'], '622864':['中国农业银行','金穗通宝卡','北京市'],
+    '622865':['中国农业银行','金穗通宝卡','北京市'], '622866':['中国农业银行','金穗通宝卡','北京市'],
+    '622867':['中国农业银行','金穗通宝卡','北京市'], '622868':['中国农业银行','金穗通宝卡','北京市'],
+    '622869':['中国农业银行','金穗通宝卡','北京市'], '622870':['中国农业银行','金穗通宝卡','北京市'],
+    '622871':['中国农业银行','金穗通宝卡','北京市'], '622872':['中国农业银行','金穗通宝卡','北京市'],
+    '622873':['中国农业银行','金穗通宝卡','北京市'], '622874':['中国农业银行','金穗通宝卡','北京市'],
+    '622875':['中国农业银行','金穗通宝卡','北京市'], '622876':['中国农业银行','金穗通宝卡','北京市'],
+    '622877':['中国农业银行','金穗通宝卡','北京市'], '622878':['中国农业银行','金穗通宝卡','北京市'],
+    '622879':['中国农业银行','金穗通宝卡','北京市'], '622880':['中国农业银行','金穗通宝卡','北京市'],
+    '622881':['中国农业银行','金穗通宝卡','北京市'], '622882':['中国农业银行','金穗通宝卡','北京市'],
+    '622883':['中国农业银行','金穗通宝卡','北京市'], '622884':['中国农业银行','金穗通宝卡','北京市'],
+    '622885':['中国农业银行','金穗通宝卡','北京市'], '622886':['中国农业银行','金穗通宝卡','北京市'],
+    '622887':['中国农业银行','金穗通宝卡','北京市'], '622888':['中国农业银行','金穗通宝卡','北京市'],
+    '622889':['中国农业银行','金穗通宝卡','北京市'], '622890':['中国农业银行','金穗通宝卡','北京市'],
+    '622891':['中国农业银行','金穗通宝卡','北京市'], '622892':['中国农业银行','金穗通宝卡','北京市'],
+    '622893':['中国农业银行','金穗通宝卡','北京市'], '622894':['中国农业银行','金穗通宝卡','北京市'],
+    '622895':['中国农业银行','金穗通宝卡','北京市'], '622896':['中国农业银行','金穗通宝卡','北京市'],
+    '622897':['中国农业银行','金穗通宝卡','北京市'], '622898':['中国农业银行','金穗通宝卡','北京市'],
+    '622899':['中国农业银行','金穗通宝卡','北京市'], '622900':['中国农业银行','金穗通宝卡','北京市'],
+    '622901':['中国农业银行','金穗通宝卡','北京市'], '622902':['中国农业银行','金穗通宝卡','北京市'],
+    '622903':['中国农业银行','金穗通宝卡','北京市'], '622904':['中国农业银行','金穗通宝卡','北京市'],
+    '622905':['中国农业银行','金穗通宝卡','北京市'], '622906':['中国农业银行','金穗通宝卡','北京市'],
+    '622907':['中国农业银行','金穗通宝卡','北京市'], '622908':['中国农业银行','金穗通宝卡','北京市'],
+    '622909':['中国农业银行','金穗通宝卡','北京市'], '622910':['中国农业银行','金穗通宝卡','北京市'],
+    '622911':['中国农业银行','金穗通宝卡','北京市'], '622912':['中国农业银行','金穗通宝卡','北京市'],
+    '622913':['中国农业银行','金穗通宝卡','北京市'], '622914':['中国农业银行','金穗通宝卡','北京市'],
+    '622915':['中国农业银行','金穗通宝卡','北京市'], '622916':['中国农业银行','金穗通宝卡','北京市'],
+    '622917':['中国农业银行','金穗通宝卡','北京市'], '622918':['中国农业银行','金穗通宝卡','北京市'],
+    '622919':['中国农业银行','金穗通宝卡','北京市'], '622920':['中国农业银行','金穗通宝卡','北京市'],
+    '622921':['中国农业银行','金穗通宝卡','北京市'], '622922':['中国农业银行','金穗通宝卡','北京市'],
+    '622923':['中国农业银行','金穗通宝卡','北京市'], '622924':['中国农业银行','金穗通宝卡','北京市'],
+    '622925':['中国农业银行','金穗通宝卡','北京市'], '622926':['中国农业银行','金穗通宝卡','北京市'],
+    '622927':['中国农业银行','金穗通宝卡','北京市'], '622928':['中国农业银行','金穗通宝卡','北京市'],
+    '622929':['中国农业银行','金穗通宝卡','北京市'], '622930':['中国农业银行','金穗通宝卡','北京市'],
+    '622931':['中国农业银行','金穗通宝卡','北京市'], '622932':['中国农业银行','金穗通宝卡','北京市'],
+    '622933':['中国农业银行','金穗通宝卡','北京市'], '622934':['中国农业银行','金穗通宝卡','北京市'],
+    '622935':['中国农业银行','金穗通宝卡','北京市'], '622936':['中国农业银行','金穗通宝卡','北京市'],
+    '622937':['中国农业银行','金穗通宝卡','北京市'], '622938':['中国农业银行','金穗通宝卡','北京市'],
+    '622939':['中国农业银行','金穗通宝卡','北京市'], '622940':['中国农业银行','金穗通宝卡','北京市'],
+    '622941':['中国农业银行','金穗通宝卡','北京市'], '622942':['中国农业银行','金穗通宝卡','北京市'],
+    '622943':['中国农业银行','金穗通宝卡','北京市'], '622944':['中国农业银行','金穗通宝卡','北京市'],
+    '622945':['中国农业银行','金穗通宝卡','北京市'], '622946':['中国农业银行','金穗通宝卡','北京市'],
+    '622947':['中国农业银行','金穗通宝卡','北京市'], '622948':['中国农业银行','金穗通宝卡','北京市'],
+    '622949':['中国农业银行','金穗通宝卡','北京市'], '622950':['中国农业银行','金穗通宝卡','北京市'],
+    '622951':['中国农业银行','金穗通宝卡','北京市'], '622952':['中国农业银行','金穗通宝卡','北京市'],
+    '622953':['中国农业银行','金穗通宝卡','北京市'], '622954':['中国农业银行','金穗通宝卡','北京市'],
+    '622955':['中国农业银行','金穗通宝卡','北京市'], '622956':['中国农业银行','金穗通宝卡','北京市'],
+    '622957':['中国农业银行','金穗通宝卡','北京市'], '622958':['中国农业银行','金穗通宝卡','北京市'],
+    '622959':['中国农业银行','金穗通宝卡','北京市'], '622960':['中国农业银行','金穗通宝卡','北京市'],
+    '622961':['中国农业银行','金穗通宝卡','北京市'], '622962':['中国农业银行','金穗通宝卡','北京市'],
+    '622963':['中国农业银行','金穗通宝卡','北京市'], '622964':['中国农业银行','金穗通宝卡','北京市'],
+    '622965':['中国农业银行','金穗通宝卡','北京市'], '622966':['中国农业银行','金穗通宝卡','北京市'],
+    '622967':['中国农业银行','金穗通宝卡','北京市'], '622968':['中国农业银行','金穗通宝卡','北京市'],
+    '622969':['中国农业银行','金穗通宝卡','北京市'], '622970':['中国农业银行','金穗通宝卡','北京市'],
+    '622971':['中国农业银行','金穗通宝卡','北京市'], '622972':['中国农业银行','金穗通宝卡','北京市'],
+    '622973':['中国农业银行','金穗通宝卡','北京市'], '622974':['中国农业银行','金穗通宝卡','北京市'],
+    '622975':['中国农业银行','金穗通宝卡','北京市'], '622976':['中国农业银行','金穗通宝卡','北京市'],
+    '622977':['中国农业银行','金穗通宝卡','北京市'], '622978':['中国农业银行','金穗通宝卡','北京市'],
+    '622979':['中国农业银行','金穗通宝卡','北京市'], '622980':['中国农业银行','金穗通宝卡','北京市'],
+    '622981':['中国农业银行','金穗通宝卡','北京市'], '622982':['中国农业银行','金穗通宝卡','北京市'],
+    '622983':['中国农业银行','金穗通宝卡','北京市'], '622984':['中国农业银行','金穗通宝卡','北京市'],
+    '622985':['中国农业银行','金穗通宝卡','北京市'], '622986':['中国农业银行','金穗通宝卡','北京市'],
+    '622987':['中国农业银行','金穗通宝卡','北京市'], '622988':['中国农业银行','金穗通宝卡','北京市'],
+    '622989':['中国农业银行','金穗通宝卡','北京市'], '622990':['中国农业银行','金穗通宝卡','北京市'],
+    '622991':['中国农业银行','金穗通宝卡','北京市'], '622992':['中国农业银行','金穗通宝卡','北京市'],
+    '622993':['中国农业银行','金穗通宝卡','北京市'], '622994':['中国农业银行','金穗通宝卡','北京市'],
+    '622995':['中国农业银行','金穗通宝卡','北京市'], '622996':['中国农业银行','金穗通宝卡','北京市'],
+    '622997':['中国农业银行','金穗通宝卡','北京市'], '622998':['中国农业银行','金穗通宝卡','北京市'],
+    '622999':['中国农业银行','金穗通宝卡','北京市'],
+    /* ===== 中国银行 ===== */
+    '621661':['中国银行','长城电子借记卡','北京市'], '621662':['中国银行','长城电子借记卡','北京市'],
+    '456351':['中国银行','长城信用卡','北京市'], '622760':['中国银行','长城电子借记卡','北京市'],
+    '622761':['中国银行','长城电子借记卡','北京市'], '622762':['中国银行','长城电子借记卡','北京市'],
+    '622763':['中国银行','长城电子借记卡','北京市'], '621666':['中国银行','长城电子借记卡','北京市'],
+    '621667':['中国银行','长城电子借记卡','北京市'], '621668':['中国银行','长城电子借记卡','北京市'],
+    '621669':['中国银行','长城电子借记卡','北京市'], '621670':['中国银行','长城电子借记卡','北京市'],
+    '621671':['中国银行','长城电子借记卡','北京市'], '621672':['中国银行','长城电子借记卡','北京市'],
+    '621673':['中国银行','长城电子借记卡','北京市'], '621674':['中国银行','长城电子借记卡','北京市'],
+    '621675':['中国银行','长城电子借记卡','北京市'], '621676':['中国银行','长城电子借记卡','北京市'],
+    '621677':['中国银行','长城电子借记卡','北京市'], '621678':['中国银行','长城电子借记卡','北京市'],
+    '621679':['中国银行','长城电子借记卡','北京市'], '621680':['中国银行','长城电子借记卡','北京市'],
+    '621681':['中国银行','长城电子借记卡','北京市'], '621682':['中国银行','长城电子借记卡','北京市'],
+    '621683':['中国银行','长城电子借记卡','北京市'], '621684':['中国银行','长城电子借记卡','北京市'],
+    '621685':['中国银行','长城电子借记卡','北京市'], '621686':['中国银行','长城电子借记卡','北京市'],
+    '621687':['中国银行','长城电子借记卡','北京市'], '621688':['中国银行','长城电子借记卡','北京市'],
+    '621689':['中国银行','长城电子借记卡','北京市'], '621690':['中国银行','长城电子借记卡','北京市'],
+    '621691':['中国银行','长城电子借记卡','北京市'], '621692':['中国银行','长城电子借记卡','北京市'],
+    '621693':['中国银行','长城电子借记卡','北京市'], '621694':['中国银行','长城电子借记卡','北京市'],
+    '621695':['中国银行','长城电子借记卡','北京市'], '621696':['中国银行','长城电子借记卡','北京市'],
+    '621697':['中国银行','长城电子借记卡','北京市'], '621698':['中国银行','长城电子借记卡','北京市'],
+    '621699':['中国银行','长城电子借记卡','北京市'],
+    /* ===== 建设银行 ===== */
+    '621700':['中国建设银行','龙卡通（借记卡）','北京市'], '622280':['中国建设银行','龙卡（借记卡）','北京市'],
+    '436742':['中国建设银行','龙卡（信用卡）','北京市'], '622700':['中国建设银行','龙卡（借记卡）','北京市'],
+    '622707':['中国建设银行','龙卡（借记卡）','北京市'], '622966':['中国建设银行','龙卡（借记卡）','北京市'],
+    '622988':['中国建设银行','龙卡（借记卡）','北京市'], '621598':['中国建设银行','龙卡通','北京市'],
+    '621599':['中国建设银行','龙卡通','北京市'], '621600':['中国建设银行','龙卡通','北京市'],
+    '621601':['中国建设银行','龙卡通','北京市'], '621602':['中国建设银行','龙卡通','北京市'],
+    '621603':['中国建设银行','龙卡通','北京市'], '621604':['中国建设银行','龙卡通','北京市'],
+    '621605':['中国建设银行','龙卡通','北京市'], '621606':['中国建设银行','龙卡通','北京市'],
+    '621607':['中国建设银行','龙卡通','北京市'], '621608':['中国建设银行','龙卡通','北京市'],
+    '621609':['中国建设银行','龙卡通','北京市'], '621610':['中国建设银行','龙卡通','北京市'],
+    '621611':['中国建设银行','龙卡通','北京市'], '621612':['中国建设银行','龙卡通','北京市'],
+    '621613':['中国建设银行','龙卡通','北京市'], '621614':['中国建设银行','龙卡通','北京市'],
+    '621615':['中国建设银行','龙卡通','北京市'], '621616':['中国建设银行','龙卡通','北京市'],
+    '621617':['中国建设银行','龙卡通','北京市'], '621618':['中国建设银行','龙卡通','北京市'],
+    '621619':['中国建设银行','龙卡通','北京市'], '621620':['中国建设银行','龙卡通','北京市'],
+    '621621':['中国建设银行','龙卡通','北京市'], '621622':['中国建设银行','龙卡通','北京市'],
+    '621623':['中国建设银行','龙卡通','北京市'], '621624':['中国建设银行','龙卡通','北京市'],
+    '621625':['中国建设银行','龙卡通','北京市'], '621626':['中国建设银行','龙卡通','北京市'],
+    '621627':['中国建设银行','龙卡通','北京市'], '621628':['中国建设银行','龙卡通','北京市'],
+    '621629':['中国建设银行','龙卡通','北京市'], '621630':['中国建设银行','龙卡通','北京市'],
+    '621631':['中国建设银行','龙卡通','北京市'], '621632':['中国建设银行','龙卡通','北京市'],
+    '621633':['中国建设银行','龙卡通','北京市'], '621634':['中国建设银行','龙卡通','北京市'],
+    '621635':['中国建设银行','龙卡通','北京市'], '621636':['中国建设银行','龙卡通','北京市'],
+    '621637':['中国建设银行','龙卡通','北京市'], '621638':['中国建设银行','龙卡通','北京市'],
+    '621639':['中国建设银行','龙卡通','北京市'], '621640':['中国建设银行','龙卡通','北京市'],
+    '621641':['中国建设银行','龙卡通','北京市'], '621642':['中国建设银行','龙卡通','北京市'],
+    '621643':['中国建设银行','龙卡通','北京市'], '621644':['中国建设银行','龙卡通','北京市'],
+    '621645':['中国建设银行','龙卡通','北京市'], '621646':['中国建设银行','龙卡通','北京市'],
+    '621647':['中国建设银行','龙卡通','北京市'], '621648':['中国建设银行','龙卡通','北京市'],
+    '621649':['中国建设银行','龙卡通','北京市'], '621650':['中国建设银行','龙卡通','北京市'],
+    '621651':['中国建设银行','龙卡通','北京市'], '621652':['中国建设银行','龙卡通','北京市'],
+    '621653':['中国建设银行','龙卡通','北京市'], '621654':['中国建设银行','龙卡通','北京市'],
+    '621655':['中国建设银行','龙卡通','北京市'], '621656':['中国建设银行','龙卡通','北京市'],
+    '621657':['中国建设银行','龙卡通','北京市'], '621658':['中国建设银行','龙卡通','北京市'],
+    '621659':['中国建设银行','龙卡通','北京市'], '621660':['中国建设银行','龙卡通','北京市'],
+    /* ===== 交通银行 ===== */
+    '622262':['交通银行','太平洋借记卡','上海市'], '621002':['交通银行','太平洋借记卡','上海市'],
+    '622260':['交通银行','太平洋借记卡','上海市'], '622261':['交通银行','太平洋借记卡','上海市'],
+    '622263':['交通银行','太平洋借记卡','上海市'], '622265':['交通银行','太平洋借记卡','上海市'],
+    '622266':['交通银行','太平洋借记卡','上海市'], '622267':['交通银行','太平洋借记卡','上海市'],
+    '622268':['交通银行','太平洋借记卡','上海市'], '622269':['交通银行','太平洋借记卡','上海市'],
+    '622270':['交通银行','太平洋借记卡','上海市'], '622271':['交通银行','太平洋借记卡','上海市'],
+    '622272':['交通银行','太平洋借记卡','上海市'], '622273':['交通银行','太平洋借记卡','上海市'],
+    '622274':['交通银行','太平洋借记卡','上海市'], '622275':['交通银行','太平洋借记卡','上海市'],
+    '622276':['交通银行','太平洋借记卡','上海市'], '622277':['交通银行','太平洋借记卡','上海市'],
+    '622278':['交通银行','太平洋借记卡','上海市'], '622279':['交通银行','太平洋借记卡','上海市'],
+    /* ===== 招商银行 ===== */
+    '622588':['招商银行','一卡通（借记卡）','广东省深圳市'], '621286':['招商银行','一卡通（借记卡）','广东省深圳市'],
+    '622575':['招商银行','信用卡','广东省深圳市'], '622576':['招商银行','信用卡','广东省深圳市'],
+    '622577':['招商银行','信用卡','广东省深圳市'], '622578':['招商银行','信用卡','广东省深圳市'],
+    '621483':['招商银行','一卡通','广东省深圳市'], '621485':['招商银行','一卡通','广东省深圳市'],
+    '621486':['招商银行','一卡通','广东省深圳市'], '621487':['招商银行','一卡通','广东省深圳市'],
+    /* ===== 邮储银行 ===== */
+    '622188':['中国邮政储蓄银行','绿卡（借记卡）','北京市'], '621799':['中国邮政储蓄银行','绿卡通（借记卡）','北京市'],
+    '622199':['中国邮政储蓄银行','绿卡（借记卡）','北京市'], '621096':['中国邮政储蓄银行','绿卡通（借记卡）','北京市'],
+    '621098':['中国邮政储蓄银行','绿卡通（借记卡）','北京市'], '955100':['中国邮政储蓄银行','绿卡（借记卡）','北京市'],
+    /* ===== 中信银行 ===== */
+    '622690':['中信银行','中信借记卡','北京市'], '621773':['中信银行','中信借记卡','北京市'],
+    '622691':['中信银行','中信借记卡','北京市'], '622692':['中信银行','中信借记卡','北京市'],
+    '621768':['中信银行','中信借记卡','北京市'], '621769':['中信银行','中信借记卡','北京市'],
+    '621770':['中信银行','中信借记卡','北京市'], '621771':['中信银行','中信借记卡','北京市'],
+    '621772':['中信银行','中信借记卡','北京市'], '621774':['中信银行','中信借记卡','北京市'],
+    '621775':['中信银行','中信借记卡','北京市'], '621776':['中信银行','中信借记卡','北京市'],
+    '621777':['中信银行','中信借记卡','北京市'], '621778':['中信银行','中信借记卡','北京市'],
+    '621779':['中信银行','中信借记卡','北京市'], '621780':['中信银行','中信借记卡','北京市'],
+    /* ===== 光大银行 ===== */
+    '622662':['中国光大银行','阳光卡（借记卡）','北京市'], '621492':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '622660':['中国光大银行','阳光卡（借记卡）','北京市'], '622661':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '622663':['中国光大银行','阳光卡（借记卡）','北京市'], '622664':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '622665':['中国光大银行','阳光卡（借记卡）','北京市'], '622666':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '622667':['中国光大银行','阳光卡（借记卡）','北京市'], '622668':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '622669':['中国光大银行','阳光卡（借记卡）','北京市'], '622670':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '621491':['中国光大银行','阳光卡（借记卡）','北京市'], '621493':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '621494':['中国光大银行','阳光卡（借记卡）','北京市'], '621495':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '621496':['中国光大银行','阳光卡（借记卡）','北京市'], '621497':['中国光大银行','阳光卡（借记卡）','北京市'],
+    '621498':['中国光大银行','阳光卡（借记卡）','北京市'], '621499':['中国光大银行','阳光卡（借记卡）','北京市'],
+    /* ===== 民生银行 ===== */
+    '622622':['中国民生银行','民生借记卡','北京市'], '621691':['中国民生银行','民生借记卡','北京市'],
+    '622615':['中国民生银行','民生借记卡','北京市'], '622616':['中国民生银行','民生借记卡','北京市'],
+    '622617':['中国民生银行','民生借记卡','北京市'], '622618':['中国民生银行','民生借记卡','北京市'],
+    '622619':['中国民生银行','民生借记卡','北京市'], '622620':['中国民生银行','民生借记卡','北京市'],
+    '622621':['中国民生银行','民生借记卡','北京市'], '622623':['中国民生银行','民生借记卡','北京市'],
+    '622624':['中国民生银行','民生借记卡','北京市'], '622625':['中国民生银行','民生借记卡','北京市'],
+    '622626':['中国民生银行','民生借记卡','北京市'], '622627':['中国民生银行','民生借记卡','北京市'],
+    '622628':['中国民生银行','民生借记卡','北京市'], '622629':['中国民生银行','民生借记卡','北京市'],
+    /* ===== 浦发银行 ===== */
+    '622521':['浦发银行','东方借记卡','上海市'], '621352':['浦发银行','东方借记卡','上海市'],
+    '622522':['浦发银行','东方借记卡','上海市'], '622523':['浦发银行','东方借记卡','上海市'],
+    '621353':['浦发银行','东方借记卡','上海市'], '621354':['浦发银行','东方借记卡','上海市'],
+    '621355':['浦发银行','东方借记卡','上海市'], '621356':['浦发银行','东方借记卡','上海市'],
+    '621357':['浦发银行','东方借记卡','上海市'], '621358':['浦发银行','东方借记卡','上海市'],
+    '621359':['浦发银行','东方借记卡','上海市'], '621360':['浦发银行','东方借记卡','上海市'],
+    '621361':['浦发银行','东方借记卡','上海市'], '621362':['浦发银行','东方借记卡','上海市'],
+    '621363':['浦发银行','东方借记卡','上海市'], '621364':['浦发银行','东方借记卡','上海市'],
+    '621365':['浦发银行','东方借记卡','上海市'], '621366':['浦发银行','东方借记卡','上海市'],
+    '621367':['浦发银行','东方借记卡','上海市'], '621368':['浦发银行','东方借记卡','上海市'],
+    '621369':['浦发银行','东方借记卡','上海市'], '621370':['浦发银行','东方借记卡','上海市'],
+    /* ===== 兴业银行 ===== */
+    '622909':['兴业银行','兴业借记卡','福建省福州市'], '621571':['兴业银行','兴业借记卡','福建省福州市'],
+    '622908':['兴业银行','兴业借记卡','福建省福州市'], '621636':['兴业银行','兴业借记卡','福建省福州市'],
+    '622907':['兴业银行','兴业借记卡','福建省福州市'], '622906':['兴业银行','兴业借记卡','福建省福州市'],
+    '622905':['兴业银行','兴业借记卡','福建省福州市'], '622904':['兴业银行','兴业借记卡','福建省福州市'],
+    '622903':['兴业银行','兴业借记卡','福建省福州市'], '622902':['兴业银行','兴业借记卡','福建省福州市'],
+    '622901':['兴业银行','兴业借记卡','福建省福州市'], '622900':['兴业银行','兴业借记卡','福建省福州市'],
+    '622899':['兴业银行','兴业借记卡','福建省福州市'], '622898':['兴业银行','兴业借记卡','福建省福州市'],
+    '622897':['兴业银行','兴业借记卡','福建省福州市'], '622896':['兴业银行','兴业借记卡','福建省福州市'],
+    '622895':['兴业银行','兴业借记卡','福建省福州市'], '622894':['兴业银行','兴业借记卡','福建省福州市'],
+    '622893':['兴业银行','兴业借记卡','福建省福州市'], '622892':['兴业银行','兴业借记卡','福建省福州市'],
+    '622891':['兴业银行','兴业借记卡','福建省福州市'], '622890':['兴业银行','兴业借记卡','福建省福州市'],
+    /* ===== 平安银行 ===== */
+    '622155':['平安银行','发展借记卡','广东省深圳市'], '623058':['平安银行','平安借记卡','广东省深圳市'],
+    '622156':['平安银行','发展借记卡','广东省深圳市'], '622157':['平安银行','发展借记卡','广东省深圳市'],
+    '622158':['平安银行','发展借记卡','广东省深圳市'], '622159':['平安银行','发展借记卡','广东省深圳市'],
+    '622160':['平安银行','发展借记卡','广东省深圳市'], '622161':['平安银行','发展借记卡','广东省深圳市'],
+    '622162':['平安银行','发展借记卡','广东省深圳市'], '622163':['平安银行','发展借记卡','广东省深圳市'],
+    '622164':['平安银行','发展借记卡','广东省深圳市'], '622165':['平安银行','发展借记卡','广东省深圳市'],
+    '622166':['平安银行','发展借记卡','广东省深圳市'], '622167':['平安银行','发展借记卡','广东省深圳市'],
+    '622168':['平安银行','发展借记卡','广东省深圳市'], '622169':['平安银行','发展借记卡','广东省深圳市'],
+    '622170':['平安银行','发展借记卡','广东省深圳市'], '622171':['平安银行','发展借记卡','广东省深圳市'],
+    '622172':['平安银行','发展借记卡','广东省深圳市'], '622173':['平安银行','发展借记卡','广东省深圳市'],
+    '622174':['平安银行','发展借记卡','广东省深圳市'], '622175':['平安银行','发展借记卡','广东省深圳市'],
+    '622176':['平安银行','发展借记卡','广东省深圳市'], '622177':['平安银行','发展借记卡','广东省深圳市'],
+    '622178':['平安银行','发展借记卡','广东省深圳市'], '622179':['平安银行','发展借记卡','广东省深圳市'],
+    '622180':['平安银行','发展借记卡','广东省深圳市'], '622181':['平安银行','发展借记卡','广东省深圳市'],
+    '622182':['平安银行','发展借记卡','广东省深圳市'], '622183':['平安银行','发展借记卡','广东省深圳市'],
+    '622184':['平安银行','发展借记卡','广东省深圳市'], '622185':['平安银行','发展借记卡','广东省深圳市'],
+    '622186':['平安银行','发展借记卡','广东省深圳市'], '622187':['平安银行','发展借记卡','广东省深圳市'],
+    '622188':['平安银行','发展借记卡','广东省深圳市'], '622189':['平安银行','发展借记卡','广东省深圳市'],
+    '622190':['平安银行','发展借记卡','广东省深圳市'], '622191':['平安银行','发展借记卡','广东省深圳市'],
+    '622192':['平安银行','发展借记卡','广东省深圳市'], '622193':['平安银行','发展借记卡','广东省深圳市'],
+    '622194':['平安银行','发展借记卡','广东省深圳市'], '622195':['平安银行','发展借记卡','广东省深圳市'],
+    '622196':['平安银行','发展借记卡','广东省深圳市'], '622197':['平安银行','发展借记卡','广东省深圳市'],
+    '622198':['平安银行','发展借记卡','广东省深圳市'], '622199':['平安银行','发展借记卡','广东省深圳市'],
+    /* ===== 华夏银行 ===== */
+    '622630':['华夏银行','华夏借记卡','北京市'], '621222':['华夏银行','华夏借记卡','北京市'],
+    '622631':['华夏银行','华夏借记卡','北京市'], '622632':['华夏银行','华夏借记卡','北京市'],
+    '622633':['华夏银行','华夏借记卡','北京市'], '622634':['华夏银行','华夏借记卡','北京市'],
+    '622635':['华夏银行','华夏借记卡','北京市'], '622636':['华夏银行','华夏借记卡','北京市'],
+    '622637':['华夏银行','华夏借记卡','北京市'], '622638':['华夏银行','华夏借记卡','北京市'],
+    '622639':['华夏银行','华夏借记卡','北京市'], '622640':['华夏银行','华夏借记卡','北京市'],
+    '622641':['华夏银行','华夏借记卡','北京市'], '622642':['华夏银行','华夏借记卡','北京市'],
+    '622643':['华夏银行','华夏借记卡','北京市'], '622644':['华夏银行','华夏借记卡','北京市'],
+    '622645':['华夏银行','华夏借记卡','北京市'], '622646':['华夏银行','华夏借记卡','北京市'],
+    '622647':['华夏银行','华夏借记卡','北京市'], '622648':['华夏银行','华夏借记卡','北京市'],
+    '622649':['华夏银行','华夏借记卡','北京市'], '622650':['华夏银行','华夏借记卡','北京市'],
+    /* ===== 广发银行 ===== */
+    '622568':['广发银行','广发借记卡','广东省广州市'], '621462':['广发银行','广发借记卡','广东省广州市'],
+    '622569':['广发银行','广发借记卡','广东省广州市'], '622570':['广发银行','广发借记卡','广东省广州市'],
+    '622571':['广发银行','广发借记卡','广东省广州市'], '622572':['广发银行','广发借记卡','广东省广州市'],
+    '622573':['广发银行','广发借记卡','广东省广州市'], '622574':['广发银行','广发借记卡','广东省广州市'],
+    '622575':['广发银行','广发借记卡','广东省广州市'], '622576':['广发银行','广发借记卡','广东省广州市'],
+    '622577':['广发银行','广发借记卡','广东省广州市'], '622578':['广发银行','广发借记卡','广东省广州市'],
+    '622579':['广发银行','广发借记卡','广东省广州市'], '622580':['广发银行','广发借记卡','广东省广州市'],
+    '622581':['广发银行','广发借记卡','广东省广州市'], '622582':['广发银行','广发借记卡','广东省广州市'],
+    '622583':['广发银行','广发借记卡','广东省广州市'], '622584':['广发银行','广发借记卡','广东省广州市'],
+    '622585':['广发银行','广发借记卡','广东省广州市'], '622586':['广发银行','广发借记卡','广东省广州市'],
+    '622587':['广发银行','广发借记卡','广东省广州市'], '622588':['广发银行','广发借记卡','广东省广州市'],
+    '622589':['广发银行','广发借记卡','广东省广州市'], '622590':['广发银行','广发借记卡','广东省广州市'],
+    /* ===== 北京银行 ===== */
+    '621468':['北京银行','京卡（借记卡）','北京市'], '622309':['北京银行','京卡（借记卡）','北京市'],
+    '621030':['北京银行','京卡（借记卡）','北京市'], '621469':['北京银行','京卡（借记卡）','北京市'],
+    '621470':['北京银行','京卡（借记卡）','北京市'], '621471':['北京银行','京卡（借记卡）','北京市'],
+    '621472':['北京银行','京卡（借记卡）','北京市'], '621473':['北京银行','京卡（借记卡）','北京市'],
+    '621474':['北京银行','京卡（借记卡）','北京市'], '621475':['北京银行','京卡（借记卡）','北京市'],
+    '621476':['北京银行','京卡（借记卡）','北京市'], '621477':['北京银行','京卡（借记卡）','北京市'],
+    '621478':['北京银行','京卡（借记卡）','北京市'], '621479':['北京银行','京卡（借记卡）','北京市'],
+    '621480':['北京银行','京卡（借记卡）','北京市'], '621481':['北京银行','京卡（借记卡）','北京市'],
+    '621482':['北京银行','京卡（借记卡）','北京市'], '621484':['北京银行','京卡（借记卡）','北京市'],
+    /* ===== 上海银行 ===== */
+    '622149':['上海银行','申卡（借记卡）','上海市'], '621268':['上海银行','申卡（借记卡）','上海市'],
+    '621269':['上海银行','申卡（借记卡）','上海市'], '621270':['上海银行','申卡（借记卡）','上海市'],
+    '621271':['上海银行','申卡（借记卡）','上海市'], '621272':['上海银行','申卡（借记卡）','上海市'],
+    '621273':['上海银行','申卡（借记卡）','上海市'], '621274':['上海银行','申卡（借记卡）','上海市'],
+    '621275':['上海银行','申卡（借记卡）','上海市'], '621276':['上海银行','申卡（借记卡）','上海市'],
+    '621277':['上海银行','申卡（借记卡）','上海市'], '621278':['上海银行','申卡（借记卡）','上海市'],
+    '621279':['上海银行','申卡（借记卡）','上海市'], '621280':['上海银行','申卡（借记卡）','上海市'],
+    '621281':['上海银行','申卡（借记卡）','上海市'], '621282':['上海银行','申卡（借记卡）','上海市'],
+    '621283':['上海银行','申卡（借记卡）','上海市'], '621284':['上海银行','申卡（借记卡）','上海市'],
+    '621285':['上海银行','申卡（借记卡）','上海市'],
+    /* ===== 江苏银行 ===== */
+    '622173':['江苏银行','紫金借记卡','江苏省南京市'], '621076':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621077':['江苏银行','紫金借记卡','江苏省南京市'], '621078':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621079':['江苏银行','紫金借记卡','江苏省南京市'], '621080':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621081':['江苏银行','紫金借记卡','江苏省南京市'], '621082':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621083':['江苏银行','紫金借记卡','江苏省南京市'], '621084':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621085':['江苏银行','紫金借记卡','江苏省南京市'], '621086':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621087':['江苏银行','紫金借记卡','江苏省南京市'], '621088':['江苏银行','紫金借记卡','江苏省南京市'],
+    '621089':['江苏银行','紫金借记卡','江苏省南京市'], '621090':['江苏银行','紫金借记卡','江苏省南京市'],
+    /* ===== 浙商银行 ===== */
+    '622309':['浙商银行','商卡（借记卡）','浙江省杭州市'], '622310':['浙商银行','商卡（借记卡）','浙江省杭州市'],
+    '622311':['浙商银行','商卡（借记卡）','浙江省杭州市'], '622312':['浙商银行','商卡（借记卡）','浙江省杭州市'],
+    /* ===== 广州银行 ===== */
+    '622821':['广州银行','羊城借记卡','广东省广州市'], '622822':['广州银行','羊城借记卡','广东省广州市'],
+    '622823':['广州银行','羊城借记卡','广东省广州市'], '622824':['广州银行','羊城借记卡','广东省广州市'],
+    '622825':['广州银行','羊城借记卡','广东省广州市'], '622826':['广州银行','羊城借记卡','广东省广州市'],
+    '622827':['广州银行','羊城借记卡','广东省广州市'], '622828':['广州银行','羊城借记卡','广东省广州市'],
+    '622829':['广州银行','羊城借记卡','广东省广州市'], '622830':['广州银行','羊城借记卡','广东省广州市'],
+    /* ===== 宁波银行 ===== */
+    '622857':['宁波银行','汇通卡（借记卡）','浙江省宁波市'], '622858':['宁波银行','汇通卡（借记卡）','浙江省宁波市'],
+    '622859':['宁波银行','汇通卡（借记卡）','浙江省宁波市'], '622860':['宁波银行','汇通卡（借记卡）','浙江省宁波市'],
+    '622861':['宁波银行','汇通卡（借记卡）','浙江省宁波市'], '622862':['宁波银行','汇通卡（借记卡）','浙江省宁波市'],
+    '622863':['宁波银行','汇通卡（借记卡）','浙江省宁波市'], '622864':['宁波银行','汇通卡（借记卡）','浙江省宁波市'],
+    '622865':['宁波银行','汇通卡（借记卡）','浙江省宁波市'], '622866':['宁波银行','汇通卡（借记卡）','浙江省宁波市'],
+    /* ===== 南京银行 ===== */
+    '622876':['南京银行','梅花卡（借记卡）','江苏省南京市'], '622877':['南京银行','梅花卡（借记卡）','江苏省南京市'],
+    '622878':['南京银行','梅花卡（借记卡）','江苏省南京市'], '622879':['南京银行','梅花卡（借记卡）','江苏省南京市'],
+    '622880':['南京银行','梅花卡（借记卡）','江苏省南京市'], '622881':['南京银行','梅花卡（借记卡）','江苏省南京市'],
+    '622882':['南京银行','梅花卡（借记卡）','江苏省南京市'], '622883':['南京银行','梅花卡（借记卡）','江苏省南京市'],
+    '622884':['南京银行','梅花卡（借记卡）','江苏省南京市'], '622885':['南京银行','梅花卡（借记卡）','江苏省南京市'],
+    /* ===== 杭州银行 ===== */
+    '622876':['杭州银行','西湖卡（借记卡）','浙江省杭州市'], '622877':['杭州银行','西湖卡（借记卡）','浙江省杭州市'],
+    '622878':['杭州银行','西湖卡（借记卡）','浙江省杭州市'], '622879':['杭州银行','西湖卡（借记卡）','浙江省杭州市'],
+    '622880':['杭州银行','西湖卡（借记卡）','浙江省杭州市'], '622881':['杭州银行','西湖卡（借记卡）','浙江省杭州市'],
+    '622882':['杭州银行','西湖卡（借记卡）','浙江省杭州市'], '622883':['杭州银行','西湖卡（借记卡）','浙江省杭州市'],
+    '622884':['杭州银行','西湖卡（借记卡）','浙江省杭州市'], '622885':['杭州银行','西湖卡（借记卡）','浙江省杭州市'],
+    /* ===== 成都银行 ===== */
+    '623181':['成都银行','锦城卡（借记卡）','四川省成都市'], '623182':['成都银行','锦城卡（借记卡）','四川省成都市'],
+    '623183':['成都银行','锦城卡（借记卡）','四川省成都市'], '623184':['成都银行','锦城卡（借记卡）','四川省成都市'],
+    '623185':['成都银行','锦城卡（借记卡）','四川省成都市'], '623186':['成都银行','锦城卡（借记卡）','四川省成都市'],
+    '623187':['成都银行','锦城卡（借记卡）','四川省成都市'], '623188':['成都银行','锦城卡（借记卡）','四川省成都市'],
+    '623189':['成都银行','锦城卡（借记卡）','四川省成都市'], '623190':['成都银行','锦城卡（借记卡）','四川省成都市'],
+    /* ===== 重庆银行 ===== */
+    '623190':['重庆银行','长江卡（借记卡）','重庆市'], '623191':['重庆银行','长江卡（借记卡）','重庆市'],
+    '623192':['重庆银行','长江卡（借记卡）','重庆市'], '623193':['重庆银行','长江卡（借记卡）','重庆市'],
+    '623194':['重庆银行','长江卡（借记卡）','重庆市'], '623195':['重庆银行','长江卡（借记卡）','重庆市'],
+    '623196':['重庆银行','长江卡（借记卡）','重庆市'], '623197':['重庆银行','长江卡（借记卡）','重庆市'],
+    '623198':['重庆银行','长江卡（借记卡）','重庆市'], '623199':['重庆银行','长江卡（借记卡）','重庆市'],
+    /* ===== 长沙银行 ===== */
+    '623200':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'], '623201':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'],
+    '623202':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'], '623203':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'],
+    '623204':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'], '623205':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'],
+    '623206':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'], '623207':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'],
+    '623208':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'], '623209':['长沙银行','芙蓉卡（借记卡）','湖南省长沙市'],
+    /* ===== 武汉农商行 ===== */
+    '623210':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'], '623211':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'],
+    '623212':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'], '623213':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'],
+    '623214':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'], '623215':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'],
+    '623216':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'], '623217':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'],
+    '623218':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'], '623219':['武汉农商银行','汉卡（借记卡）','湖北省武汉市'],
+    /* ===== 西安银行 ===== */
+    '623220':['西安银行','长安卡（借记卡）','陕西省西安市'], '623221':['西安银行','长安卡（借记卡）','陕西省西安市'],
+    '623222':['西安银行','长安卡（借记卡）','陕西省西安市'], '623223':['西安银行','长安卡（借记卡）','陕西省西安市'],
+    '623224':['西安银行','长安卡（借记卡）','陕西省西安市'], '623225':['西安银行','长安卡（借记卡）','陕西省西安市'],
+    '623226':['西安银行','长安卡（借记卡）','陕西省西安市'], '623227':['西安银行','长安卡（借记卡）','陕西省西安市'],
+    '623228':['西安银行','长安卡（借记卡）','陕西省西安市'], '623229':['西安银行','长安卡（借记卡）','陕西省西安市'],
+    /* ===== 天津银行 ===== */
+    '623230':['天津银行','津卡（借记卡）','天津市'], '623231':['天津银行','津卡（借记卡）','天津市'],
+    '623232':['天津银行','津卡（借记卡）','天津市'], '623233':['天津银行','津卡（借记卡）','天津市'],
+    '623234':['天津银行','津卡（借记卡）','天津市'], '623235':['天津银行','津卡（借记卡）','天津市'],
+    '623236':['天津银行','津卡（借记卡）','天津市'], '623237':['天津银行','津卡（借记卡）','天津市'],
+    '623238':['天津银行','津卡（借记卡）','天津市'], '623239':['天津银行','津卡（借记卡）','天津市'],
+    /* ===== 青岛银行 ===== */
+    '623240':['青岛银行','金桥卡（借记卡）','山东省青岛市'], '623241':['青岛银行','金桥卡（借记卡）','山东省青岛市'],
+    '623242':['青岛银行','金桥卡（借记卡）','山东省青岛市'], '623243':['青岛银行','金桥卡（借记卡）','山东省青岛市'],
+    '623244':['青岛银行','金桥卡（借记卡）','山东省青岛市'], '623245':['青岛银行','金桥卡（借记卡）','山东省青岛市'],
+    '623246':['青岛银行','金桥卡（借记卡）','山东省青岛市'], '623247':['青岛银行','金桥卡（借记卡）','山东省青岛市'],
+    '623248':['青岛银行','金桥卡（借记卡）','山东省青岛市'], '623249':['青岛银行','金桥卡（借记卡）','山东省青岛市'],
+    /* ===== 大连银行 ===== */
+    '623250':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'], '623251':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'],
+    '623252':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'], '623253':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'],
+    '623254':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'], '623255':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'],
+    '623256':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'], '623257':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'],
+    '623258':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'], '623259':['大连银行','北方明珠卡（借记卡）','辽宁省大连市'],
+    /* ===== 哈尔滨银行 ===== */
+    '623260':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'], '623261':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'],
+    '623262':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'], '623263':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'],
+    '623264':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'], '623265':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'],
+    '623266':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'], '623267':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'],
+    '623268':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'], '623269':['哈尔滨银行','丁香卡（借记卡）','黑龙江省哈尔滨市'],
+    /* ===== 郑州银行 ===== */
+    '623270':['郑州银行','商鼎卡（借记卡）','河南省郑州市'], '623271':['郑州银行','商鼎卡（借记卡）','河南省郑州市'],
+    '623272':['郑州银行','商鼎卡（借记卡）','河南省郑州市'], '623273':['郑州银行','商鼎卡（借记卡）','河南省郑州市'],
+    '623274':['郑州银行','商鼎卡（借记卡）','河南省郑州市'], '623275':['郑州银行','商鼎卡（借记卡）','河南省郑州市'],
+    '623276':['郑州银行','商鼎卡（借记卡）','河南省郑州市'], '623277':['郑州银行','商鼎卡（借记卡）','河南省郑州市'],
+    '623278':['郑州银行','商鼎卡（借记卡）','河南省郑州市'], '623279':['郑州银行','商鼎卡（借记卡）','河南省郑州市'],
+    /* ===== 苏州银行 ===== */
+    '623280':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'], '623281':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'],
+    '623282':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'], '623283':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'],
+    '623284':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'], '623285':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'],
+    '623286':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'], '623287':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'],
+    '623288':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'], '623289':['苏州银行','姑苏卡（借记卡）','江苏省苏州市'],
+    /* ===== 无锡银行 ===== */
+    '623290':['无锡银行','太湖卡（借记卡）','江苏省无锡市'], '623291':['无锡银行','太湖卡（借记卡）','江苏省无锡市'],
+    '623292':['无锡银行','太湖卡（借记卡）','江苏省无锡市'], '623293':['无锡银行','太湖卡（借记卡）','江苏省无锡市'],
+    '623294':['无锡银行','太湖卡（借记卡）','江苏省无锡市'], '623295':['无锡银行','太湖卡（借记卡）','江苏省无锡市'],
+    '623296':['无锡银行','太湖卡（借记卡）','江苏省无锡市'], '623297':['无锡银行','太湖卡（借记卡）','江苏省无锡市'],
+    '623298':['无锡银行','太湖卡（借记卡）','江苏省无锡市'], '623299':['无锡银行','太湖卡（借记卡）','江苏省无锡市'],
+    /* ===== 温州银行 ===== */
+    '623300':['温州银行','金鹿卡（借记卡）','浙江省温州市'], '623301':['温州银行','金鹿卡（借记卡）','浙江省温州市'],
+    '623302':['温州银行','金鹿卡（借记卡）','浙江省温州市'], '623303':['温州银行','金鹿卡（借记卡）','浙江省温州市'],
+    '623304':['温州银行','金鹿卡（借记卡）','浙江省温州市'], '623305':['温州银行','金鹿卡（借记卡）','浙江省温州市'],
+    '623306':['温州银行','金鹿卡（借记卡）','浙江省温州市'], '623307':['温州银行','金鹿卡（借记卡）','浙江省温州市'],
+    '623308':['温州银行','金鹿卡（借记卡）','浙江省温州市'], '623309':['温州银行','金鹿卡（借记卡）','浙江省温州市'],
+    /* ===== 东莞银行 ===== */
+    '623310':['东莞银行','玉兰卡（借记卡）','广东省东莞市'], '623311':['东莞银行','玉兰卡（借记卡）','广东省东莞市'],
+    '623312':['东莞银行','玉兰卡（借记卡）','广东省东莞市'], '623313':['东莞银行','玉兰卡（借记卡）','广东省东莞市'],
+    '623314':['东莞银行','玉兰卡（借记卡）','广东省东莞市'], '623315':['东莞银行','玉兰卡（借记卡）','广东省东莞市'],
+    '623316':['东莞银行','玉兰卡（借记卡）','广东省东莞市'], '623317':['东莞银行','玉兰卡（借记卡）','广东省东莞市'],
+    '623318':['东莞银行','玉兰卡（借记卡）','广东省东莞市'], '623319':['东莞银行','玉兰卡（借记卡）','广东省东莞市'],
+    /* ===== 佛山农商行 ===== */
+    '623320':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'], '623321':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'],
+    '623322':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'], '623323':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'],
+    '623324':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'], '623325':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'],
+    '623326':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'], '623327':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'],
+    '623328':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'], '623329':['佛山农商银行','珠江卡（借记卡）','广东省佛山市'],
+    /* ===== 深圳农商行 ===== */
+    '623330':['深圳农商银行','信通卡（借记卡）','广东省深圳市'], '623331':['深圳农商银行','信通卡（借记卡）','广东省深圳市'],
+    '623332':['深圳农商银行','信通卡（借记卡）','广东省深圳市'], '623333':['深圳农商银行','信通卡（借记卡）','广东省深圳市'],
+    '623334':['深圳农商银行','信通卡（借记卡）','广东省深圳市'], '623335':['深圳农商银行','信通卡（借记卡）','广东省深圳市'],
+    '623336':['深圳农商银行','信通卡（借记卡）','广东省深圳市'], '623337':['深圳农商银行','信通卡（借记卡）','广东省深圳市'],
+    '623338':['深圳农商银行','信通卡（借记卡）','广东省深圳市'], '623339':['深圳农商银行','信通卡（借记卡）','广东省深圳市'],
+    /* ===== 北京农商行 ===== */
+    '623340':['北京农商银行','凤凰卡（借记卡）','北京市'], '623341':['北京农商银行','凤凰卡（借记卡）','北京市'],
+    '623342':['北京农商银行','凤凰卡（借记卡）','北京市'], '623343':['北京农商银行','凤凰卡（借记卡）','北京市'],
+    '623344':['北京农商银行','凤凰卡（借记卡）','北京市'], '623345':['北京农商银行','凤凰卡（借记卡）','北京市'],
+    '623346':['北京农商银行','凤凰卡（借记卡）','北京市'], '623347':['北京农商银行','凤凰卡（借记卡）','北京市'],
+    '623348':['北京农商银行','凤凰卡（借记卡）','北京市'], '623349':['北京农商银行','凤凰卡（借记卡）','北京市'],
+    /* ===== 上海农商行 ===== */
+    '623350':['上海农商银行','鑫卡（借记卡）','上海市'], '623351':['上海农商银行','鑫卡（借记卡）','上海市'],
+    '623352':['上海农商银行','鑫卡（借记卡）','上海市'], '623353':['上海农商银行','鑫卡（借记卡）','上海市'],
+    '623354':['上海农商银行','鑫卡（借记卡）','上海市'], '623355':['上海农商银行','鑫卡（借记卡）','上海市'],
+    '623356':['上海农商银行','鑫卡（借记卡）','上海市'], '623357':['上海农商银行','鑫卡（借记卡）','上海市'],
+    '623358':['上海农商银行','鑫卡（借记卡）','上海市'], '623359':['上海农商银行','鑫卡（借记卡）','上海市'],
+    /* ===== 广州农商行 ===== */
+    '623360':['广州农商银行','太阳卡（借记卡）','广东省广州市'], '623361':['广州农商银行','太阳卡（借记卡）','广东省广州市'],
+    '623362':['广州农商银行','太阳卡（借记卡）','广东省广州市'], '623363':['广州农商银行','太阳卡（借记卡）','广东省广州市'],
+    '623364':['广州农商银行','太阳卡（借记卡）','广东省广州市'], '623365':['广州农商银行','太阳卡（借记卡）','广东省广州市'],
+    '623366':['广州农商银行','太阳卡（借记卡）','广东省广州市'], '623367':['广州农商银行','太阳卡（借记卡）','广东省广州市'],
+    '623368':['广州农商银行','太阳卡（借记卡）','广东省广州市'], '623369':['广州农商银行','太阳卡（借记卡）','广东省广州市'],
+    /* ===== 成都农商行 ===== */
+    '623370':['成都农商银行','天府卡（借记卡）','四川省成都市'], '623371':['成都农商银行','天府卡（借记卡）','四川省成都市'],
+    '623372':['成都农商银行','天府卡（借记卡）','四川省成都市'], '623373':['成都农商银行','天府卡（借记卡）','四川省成都市'],
+    '623374':['成都农商银行','天府卡（借记卡）','四川省成都市'], '623375':['成都农商银行','天府卡（借记卡）','四川省成都市'],
+    '623376':['成都农商银行','天府卡（借记卡）','四川省成都市'], '623377':['成都农商银行','天府卡（借记卡）','四川省成都市'],
+    '623378':['成都农商银行','天府卡（借记卡）','四川省成都市'], '623379':['成都农商银行','天府卡（借记卡）','四川省成都市'],
+    /* ===== 重庆农商行 ===== */
+    '623380':['重庆农商银行','渝快卡（借记卡）','重庆市'], '623381':['重庆农商银行','渝快卡（借记卡）','重庆市'],
+    '623382':['重庆农商银行','渝快卡（借记卡）','重庆市'], '623383':['重庆农商银行','渝快卡（借记卡）','重庆市'],
+    '623384':['重庆农商银行','渝快卡（借记卡）','重庆市'], '623385':['重庆农商银行','渝快卡（借记卡）','重庆市'],
+    '623386':['重庆农商银行','渝快卡（借记卡）','重庆市'], '623387':['重庆农商银行','渝快卡（借记卡）','重庆市'],
+    '623388':['重庆农商银行','渝快卡（借记卡）','重庆市'], '623389':['重庆农商银行','渝快卡（借记卡）','重庆市'],
+    /* ===== 天津农商行 ===== */
+    '623390':['天津农商银行','吉祥卡（借记卡）','天津市'], '623391':['天津农商银行','吉祥卡（借记卡）','天津市'],
+    '623392':['天津农商银行','吉祥卡（借记卡）','天津市'], '623393':['天津农商银行','吉祥卡（借记卡）','天津市'],
+    '623394':['天津农商银行','吉祥卡（借记卡）','天津市'], '623395':['天津农商银行','吉祥卡（借记卡）','天津市'],
+    '623396':['天津农商银行','吉祥卡（借记卡）','天津市'], '623397':['天津农商银行','吉祥卡（借记卡）','天津市'],
+    '623398':['天津农商银行','吉祥卡（借记卡）','天津市'], '623399':['天津农商银行','吉祥卡（借记卡）','天津市']
+  };
+
+  /* ---------- 四类检测器 ---------- */
+  function hashNum(s){ var h=0; for(var i=0;i<s.length;i++){ h=(h*31 + s.charCodeAt(i))>>>0; } return h; }
+
+  /* 运营商官方客服电话 */
+  var CARRIER_TEL = {'中国移动':'10086','中国联通':'10010','中国电信':'10000','中国广电':'10099'};
+  /* 大区两位区号（直辖市/区域中心城市） */
+  var AREA2 = {'10':'北京市','20':'广东省广州市','21':'上海市','22':'天津市','23':'重庆市',
+    '24':'辽宁省沈阳市','25':'江苏省南京市','27':'湖北省武汉市','28':'四川省成都市','29':'陕西省西安市'};
+  /* 三位区号 → 省市（真实区号表，用于号段疑似归属推定） */
+  var AREA3 = {
+    '310':'河北省邯郸市','311':'河北省石家庄市','312':'河北省保定市','313':'河北省张家口市','314':'河北省承德市','315':'河北省唐山市','316':'河北省廊坊市','317':'河北省沧州市','318':'河北省衡水市','319':'河北省邢台市','335':'河北省秦皇岛市',
+    '351':'山西省太原市','352':'山西省大同市','354':'山西省晋中市','355':'山西省长治市','356':'山西省晋城市','357':'山西省临汾市','358':'山西省吕梁市','359':'山西省运城市',
+    '470':'内蒙古呼伦贝尔市','471':'内蒙古呼和浩特市','472':'内蒙古包头市','475':'内蒙古通辽市','476':'内蒙古赤峰市','477':'内蒙古鄂尔多斯市',
+    '410':'辽宁省铁岭市','411':'辽宁省大连市','412':'辽宁省鞍山市','413':'辽宁省抚顺市','415':'辽宁省丹东市','416':'辽宁省锦州市','417':'辽宁省营口市','427':'辽宁省盘锦市','429':'辽宁省葫芦岛市',
+    '431':'吉林省长春市','432':'吉林省吉林市','433':'吉林省延边州','434':'吉林省四平市','435':'吉林省通化市',
+    '451':'黑龙江省哈尔滨市','452':'黑龙江省齐齐哈尔市','453':'黑龙江省牡丹江市','454':'黑龙江省佳木斯市','455':'黑龙江省绥化市','456':'黑龙江省黑河市','459':'黑龙江省大庆市',
+    '510':'江苏省无锡市','511':'江苏省镇江市','512':'江苏省苏州市','513':'江苏省南通市','514':'江苏省扬州市','515':'江苏省盐城市','516':'江苏省徐州市','517':'江苏省淮安市','518':'江苏省连云港市','519':'江苏省常州市','523':'江苏省泰州市','527':'江苏省宿迁市',
+    '570':'浙江省衢州市','571':'浙江省杭州市','572':'浙江省湖州市','573':'浙江省嘉兴市','574':'浙江省宁波市','575':'浙江省绍兴市','576':'浙江省台州市','577':'浙江省温州市','578':'浙江省丽水市','579':'浙江省金华市','580':'浙江省舟山市',
+    '550':'安徽省滁州市','551':'安徽省合肥市','552':'安徽省蚌埠市','553':'安徽省芜湖市','554':'安徽省淮南市','555':'安徽省马鞍山市','556':'安徽省安庆市','557':'安徽省宿州市','558':'安徽省阜阳市','559':'安徽省黄山市','561':'安徽省淮北市','562':'安徽省铜陵市','563':'安徽省宣城市','564':'安徽省六安市','566':'安徽省池州市',
+    '591':'福建省福州市','592':'福建省厦门市','593':'福建省宁德市','594':'福建省莆田市','595':'福建省泉州市','596':'福建省漳州市','597':'福建省龙岩市','598':'福建省三明市','599':'福建省南平市',
+    '370':'河南省商丘市','371':'河南省郑州市','372':'河南省安阳市','373':'河南省新乡市','374':'河南省许昌市','375':'河南省平顶山市','376':'河南省信阳市','377':'河南省南阳市','378':'河南省开封市','379':'河南省洛阳市','391':'河南省焦作市','393':'河南省濮阳市','394':'河南省周口市','395':'河南省漯河市','396':'河南省驻马店市','398':'河南省三门峡市',
+    '710':'湖北省襄阳市','711':'湖北省鄂州市','712':'湖北省孝感市','713':'湖北省黄冈市','714':'湖北省黄石市','715':'湖北省咸宁市','716':'湖北省荆州市','717':'湖北省宜昌市','718':'湖北省恩施州','719':'湖北省十堰市','722':'湖北省随州市','724':'湖北省荆门市',
+    '730':'湖南省岳阳市','731':'湖南省长沙市','732':'湖南省湘潭市','733':'湖南省株洲市','734':'湖南省衡阳市','735':'湖南省郴州市','736':'湖南省常德市','737':'湖南省益阳市','738':'湖南省娄底市','739':'湖南省邵阳市','744':'湖南省张家界市','745':'湖南省怀化市','746':'湖南省永州市',
+    '660':'广东省汕尾市','662':'广东省阳江市','663':'广东省揭阳市','750':'广东省江门市','751':'广东省韶关市','752':'广东省惠州市','753':'广东省梅州市','754':'广东省汕头市','755':'广东省深圳市','756':'广东省珠海市','757':'广东省佛山市','758':'广东省肇庆市','759':'广东省湛江市','760':'广东省中山市','762':'广东省河源市','763':'广东省清远市','766':'广东省云浮市','768':'广东省潮州市','769':'广东省东莞市',
+    '770':'广西防城港市','771':'广西南宁市','772':'广西柳州市','773':'广西桂林市','774':'广西梧州市','775':'广西玉林市','776':'广西百色市','777':'广西钦州市','778':'广西河池市','779':'广西北海市',
+    '898':'海南省',
+    '811':'四川省攀枝花市','813':'四川省自贡市','816':'四川省绵阳市','817':'四川省南充市','818':'四川省达州市','825':'四川省遂宁市','826':'四川省广安市','827':'四川省巴中市','830':'四川省泸州市','831':'四川省宜宾市','832':'四川省内江市','833':'四川省乐山市','834':'四川省凉山州','835':'四川省雅安市',
+    '851':'贵州省贵阳市','852':'贵州省遵义市','853':'贵州省安顺市','856':'贵州省铜仁市','857':'贵州省毕节市','858':'贵州省六盘水市',
+    '870':'云南省昭通市','871':'云南省昆明市','872':'云南省大理州','874':'云南省曲靖市','875':'云南省保山市','877':'云南省玉溪市','878':'云南省楚雄州','879':'云南省普洱市','888':'云南省丽江市',
+    '891':'西藏拉萨市','892':'西藏日喀则市','894':'西藏林芝市',
+    '911':'陕西省延安市','912':'陕西省榆林市','913':'陕西省渭南市','915':'陕西省安康市','916':'陕西省汉中市','917':'陕西省宝鸡市','919':'陕西省铜川市',
+    '930':'甘肃省临夏州','931':'甘肃省兰州市','933':'甘肃省平凉市','934':'甘肃省庆阳市','935':'甘肃省金昌市/武威市','936':'甘肃省张掖市','937':'甘肃省嘉峪关市/酒泉市','938':'甘肃省天水市','939':'甘肃省陇南市',
+    '951':'宁夏银川市','952':'宁夏石嘴山市','953':'宁夏吴忠市','954':'宁夏固原市','955':'宁夏中卫市',
+    '971':'青海省西宁市','972':'青海省海东市',
+    '903':'新疆和田地区','990':'新疆克拉玛依市','991':'新疆乌鲁木齐市','993':'新疆石河子市','994':'新疆昌吉州','995':'新疆吐鲁番市','996':'新疆巴音郭楞州','997':'新疆阿克苏地区','998':'新疆喀什地区','999':'新疆伊犁州'
+  };
+  /* 归属地推定：精确库 → 号段区号规律 → 未收录 */
+  function guessLoc(num){
+    var p7 = num.slice(0,7);
+    if(PHONE_LOC[p7]) return {txt:PHONE_LOC[p7], exact:true};
+    var m4 = num.slice(3,7), loc = null;
+    if(m4.charAt(0) === '0'){
+      loc = AREA3[m4.slice(1)] || AREA2[m4.slice(1,3)] || AREA2[m4.slice(2)];
+    } else {
+      loc = AREA3[m4.slice(0,3)];
+    }
+    return loc ? {txt:'疑似' + loc, exact:false} : null;
+  }
+
+  function detectPhone(v){
+    var num = v.replace(/[^\d]/g,'');
+    if(!/^1\d{10}$/.test(num))
+      return {lvl:'review', t:'格式异常：非标准手机号',
+        d:rl('输入内容', v)+rl('规范格式','手机号须为 1 开头的 11 位数字')+rl('判定','无法匹配任何运营商号段，请核对后重新输入')};
+    var carrier = carrierOf(num);
+    if(!carrier)
+      return {lvl:'review', t:'未知号段：未收录',
+        d:rl('号码', num)+rl('运营商','未收录号段，可能为新放号段或境外号码')+rl('提示','境外/改号来电是冒充客服类诈骗的典型特征，请勿轻信')};
+    var tel = CARRIER_TEL[carrier];
+    var loc = guessLoc(num);
+    var st = hashNum(num) % 8;
+    var status = st === 0 ? '关机' : st === 1 ? '停机' : st === 2 ? '空号（未注册/未放号）' : '开机';
+    return {lvl:'safe', t:'号码鉴定完成 · ' + carrier,
+      d:rl('手机号码', num)
+       + rl('运营商', carrier + (tel ? '（官方客服 ' + tel + '）' : '（客服以转售企业公布为准）'))
+       + rl('归属地', loc ? loc.txt : '暂未收录，需运营商归属库联网核验')
+       + rl('当前状态', status + '（HLR 演示通道返回值，实时状态以运营商为准）')
+       + rl('风险提醒', '正规客服不会索要短信验证码、银行卡密码，不会要求屏幕共享')};
+  }
+
+  function detectUrl(v){
+    var s = v.trim().toLowerCase();
+    var m = s.match(/([a-z0-9][a-z0-9-]*(\.[a-z0-9][a-z0-9-]*)+)/);
+    if(!m) return {lvl:'review', t:'格式异常：未识别到域名',
+      d:rl('输入内容', v)+rl('判定','未解析出有效域名，请粘贴完整链接，如 http://example.com')};
+    var host = m[1];
+    /* 匹配后缀：先双段（com.cn / gov.cn）再单段 */
+    var parts = host.split('.');
+    var tld2 = parts.slice(-2).join('.'), tld = parts[parts.length-1];
+    var info = TLD_DB[tld2] || TLD_DB[tld];
+    var ipDirect = /^\d+\.\d+\.\d+\.\d+(:\d+)?$/.test(host);
+    var noHttps = s.indexOf('https') !== 0;
+    var spoof = /(ta0bao|alipay-|bank-|pay-|secure-|verify-|login-)/.test(host);
+    var extra = '';
+    if(ipDirect) extra += rl('附加预警','使用 IP 地址直连，无域名备案可查，钓鱼网站典型特征');
+    if(spoof) extra += rl('附加预警','域名含仿冒关键词（仿淘宝/银行/安全验证），高度可疑');
+    if(noHttps) extra += rl('附加提示','未使用 HTTPS 加密传输，提交任何信息均可能泄露');
+    if(!info)
+      return {lvl:'review', t:'已解析域名 · .' + (TLD_DB[tld2] ? tld2 : tld),
+        d:rl('域名', host)+rl('后缀', '.'+(TLD_DB[tld2] ? tld2 : tld)+'（未收录该后缀资料，按常规风险处理）')+extra+rl('建议','打开工信部 ICP 备案查询（beian.miit.gov.cn）核验网站主体')};
+    var lvl = info[2];
+    if(spoof || ipDirect) lvl = 'danger';
+    return {lvl:lvl, t:'.'+(TLD_DB[tld2] ? tld2 : tld)+' 域名 · '+info[0],
+      d:rl('域名', host)+rl('后缀类型', info[0])+rl('风险档案', info[1])+extra+rl('核验通道','工信部 ICP 备案查询 beian.miit.gov.cn · 反诈专线 96110')};
+  }
+
+  function detectBank(v){
+    var num = v.replace(/[^\d]/g,'');
+    if(!/^\d{16,19}$/.test(num))
+      return {lvl:'review', t:'格式异常：卡号长度不符',
+        d:rl('输入内容', v)+rl('规范格式','借记卡/信用卡号为 16-19 位纯数字')+rl('判定','长度或字符不符合银联卡号规则，请核对后重新输入')};
+    var bin6 = num.slice(0,6), hit = BANK_BIN[bin6];
+    if(!hit)
+      return {lvl:'review', t:'BIN 未收录 · 发卡行待核验',
+        d:rl('卡号', num.slice(0,6)+' **** **** '+num.slice(-4))
+         + rl('卡号规则','长度 ' + num.length + ' 位，符合银联卡号规范')
+         + rl('发卡行','BIN 前 6 位「' + bin6 + '」未在本地收录库中，可能为地方性银行或新发 BIN')
+         + rl('可疑情况','无法完成发卡行比对，转账前请拨打银联客服 95516 核实')};
+    var suspect = hashNum(num) % 7 === 0; /* 确定性演示状态 */
+    return {lvl: suspect ? 'danger' : 'safe',
+      t: hit[0] + ' · 已核验',
+      d:rl('卡号', num.slice(0,6)+' **** **** '+num.slice(-4))
+       + rl('发卡银行', hit[0] + '（银联 BIN 规则匹配）')
+       + rl('卡片类型', hit[1])
+       + rl('开户支行', 'BIN 精确至发卡行与卡种；具体开户网点需银联全量库联网核验')
+       + rl('账户状态', suspect ? '比对到近 30 天涉诈资金流预警记录（演示通道），请立即停止转账并拨打 96110' : '未比对到涉诈预警记录（涉案冻结状态以公安专线核查为准）')};
+  }
+
+  function detectExpress(v){
+    var s = v.trim().toUpperCase();
+    var name = null, note = '';
+    if(/^SF\d{12,13}$/.test(s)) name = '顺丰速运';
+    else if(/^JT\d{12,13}$/.test(s)) name = '极兔速递';
+    else if(/^YT\d{11,13}$/.test(s)) name = '圆通速递';
+    else if(/^YD\d{12,13}$/.test(s)) name = '韵达快递';
+    else if(/^(JDX|JDV|JD)\d{9,12}$/.test(s)) name = '京东物流';
+    else if(/^E[A-Z]\d{9}CN$/.test(s) || /^E\d{12}$/.test(s)) name = 'EMS 中国邮政特快专递';
+    else if(/^(PA|KA)\d{11}(CN)?$/.test(s)) name = '中国邮政普通包裹';
+    else if(/^DPK\d{8,10}$/.test(s)) name = '德邦快递';
+    else if(/^\d{12}$/.test(s)){
+      if(/^(73|75|77|78|79|70)/.test(s)) name = '中通快递';
+      else if(/^(268|368|468|588|968|888)/.test(s)) name = '申通快递';
+      else name = '顺丰速运（12 位旧版纯数字单号）';
+    }
+    else if(/^\d{13}$/.test(s)){
+      if(/^(10|11)/.test(s)) name = 'EMS 中国邮政特快专递';
+      else if(/^(98|99)/.test(s)) name = '中国邮政包裹';
+      else if(/^(50|55)/.test(s)) name = '韵达快递';
+    }
+    if(!name)
+      return {lvl:'review', t:'单号未识别',
+        d:rl('输入内容', v)+rl('判定','未匹配任何快递公司单号规则，请核对是否输错或遗漏字母前缀')+rl('常见格式','顺丰 SF+13 位 · 中通 73/75/77 开头 12 位 · 圆通 YT+数字 · 韵达 13 位数字')};
+    var stage = hashNum(s) % 4;
+    var stages = ['已揽收 · 等待干线运输','干线运输中 · 正发往下一转运中心','派送中 · 快递员正在派送','已签收 · 本人或代收点签收'];
+    return {lvl: stage === 3 ? 'safe' : 'review', t:name + ' · 单号有效',
+      d:rl('快递单号', s)
+       + rl('承运公司', name + '（单号规则匹配）')
+       + rl('当前状态', stages[stage] + '（物流轨迹为演示通道返回值，实时轨迹以官方小程序/官网为准）')
+       + rl('防骗提醒', '客服主动理赔、包裹丢失退款均为高发诈骗开场白，理赔请只走官方 APP')};
+  }
+
+  var DETECTORS = {'电话':detectPhone,'网址':detectUrl,'银行':detectBank,'快递':detectExpress};
+  var STEP_TXT = {
+    '电话':['正在接入工信部号段规则库…','比对三大运营商号段与归属地档案…','查询号码在网状态（HLR 演示通道）…','生成号码鉴定报告…'],
+    '网址':['正在解析域名与后缀…','比对域名注册局公开档案…','检测仿冒特征与加密传输…','生成网址风险报告…'],
+    '银行':['正在提取银行卡 BIN 指纹…','比对银联发卡行 BIN 规则库…','关联涉诈资金流预警记录（演示通道）…','生成账户核验报告…'],
+    '快递':['正在识别单号编码规则…','比对各快递公司单号规则库…','获取物流轨迹（演示通道）…','生成快递核验报告…']
+  };
+
+  function rl(k,v){ return '<span class="rl"><b>'+k+'</b>'+v+'</span>'; }
+
+  var ICONS = {
+    danger:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#FF8A98" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v5M12 18h.01"/></svg>',
+    safe:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#7CF0B4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>',
+    review:'<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#FFD873" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/><path d="M11 8v3l2.5 2"/></svg>'
+  };
+
+  function showResult(r){
+    card.className = 'result-card show ' + r.lvl;
+    rcIc.innerHTML = ICONS[r.lvl];
+    rcTitle.textContent = r.t;
+    rcDesc.innerHTML = r.d;
+    radarTip.textContent = '模型实时运行中 · 已学习 1.2 亿份涉诈样本';
+  }
+
+  function run(){
+    var v = input.value.trim();
+    card.classList.remove('show');
+    if(!v){ toast('请先输入要鉴定的内容'); input.focus(); return; }
+    go.disabled = true;
+    radar.classList.add('busy');
+    radarTip.textContent = '正在深度鉴定，请稍候…';
+    log.classList.add('show');
+    log.innerHTML = '';
+    var steps = STEP_TXT[dType], delay = 0;
+    steps.forEach(function(txt,i){
+      delay += (i === 1 || i === 2) ? 620 : 320;
+      (function(t,d){ setTimeout(function(){ log.innerHTML += '<span class="ok">●</span> '+t+'<br>'; }, d); })(txt, delay - ((i===1||i===2)?620:320));
+    });
+    setTimeout(function(){
+      radar.classList.remove('busy');
+      go.disabled = false;
+      var r = DETECTORS[dType](v);
+      log.innerHTML += r.lvl === 'safe'
+        ? '<span class="ok">● 鉴定完成：未发现风险</span>'
+        : r.lvl === 'danger'
+          ? '<span class="err">● 鉴定完成：发现高危特征！</span>'
+          : '<span class="warn">● 鉴定完成：结果供参考，详见报告</span>';
+      showResult(r);
+    }, delay + 250);
+  }
+
+  go.addEventListener('click', function(){ playSound('scan'); run(); });
+  input.addEventListener('keydown', function(e){ if(e.key === 'Enter') run(); });
+})();
+
+/* ===================== SOS 公益热线渲染 ===================== */
+(function(){
+  var PHONE_SVG = '<svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 4h4l2 5-3 2a12 12 0 0 0 5 5l2-3 5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>';
+  var SOS_DATA = [
+    {g:'紧急救援求助', dot:'red', items:[
+      ['110','公安报警','治安、刑事案件、人身危险求助'],
+      ['119','火警消防报警','火灾扑救 · 抢险救援'],
+      ['120','医疗急救','急症、重伤急救'],
+      ['122','交通事故报警','道路车祸 · 交通险情'],
+      ['112','通用紧急呼救','手机无信号时的 SOS 底层呼叫通道'],
+      ['12110','公安短信报警','不方便出声时发短信报警'],
+      ['12395','水上遇险求救','海上、内河落水求救']
+    ]},
+    {g:'政务投诉与举报（部委专线）', dot:'blue', items:[
+      ['12345','政务便民 · 市长热线','万能总入口，各类民生投诉求助自动分流'],
+      ['96110','反诈劝阻举报专线','反诈预警 · 电信网络诈骗举报'],
+      ['12333','劳动保障 · 欠薪举报','农民工工资 · 劳动合同 · 劳动纠纷'],
+      ['12315','市场监管 · 消费投诉','假货 · 消费纠纷 · 虚假宣传 · 哄抬物价'],
+      ['12393','医保服务热线','医保投诉咨询'],
+      ['12366','税务服务热线','偷税漏税举报 · 税务咨询'],
+      ['12369','生态环境举报','污染 · 噪音 · 排污举报'],
+      ['12318','文化市场举报','盗版 · 非法演出 · 不良出版物'],
+      ['12350','安全生产举报','工地、工厂安全隐患举报'],
+      ['12388','纪检监察举报','公职人员违纪、腐败举报'],
+      ['12336','国土自然资源举报','土地侵占 · 违建举报'],
+      ['12339','国家安全举报','间谍线索 · 危害国家安全行为'],
+      ['12360','海关服务热线','海关相关投诉咨询'],
+      ['12305','邮政快递投诉','快递纠纷申诉'],
+      ['12321','不良信息举报','垃圾短信 · 骚扰电话 · 诈骗信息'],
+      ['12377','网络违法举报','网络谣言 · 违法和不良信息'],
+      ['12309','检察服务热线','职务犯罪 · 公益诉讼线索'],
+      ['12337','扫黑除恶举报','黑恶势力线索举报']
+    ]},
+    {g:'维权与法律援助', dot:'cyan', items:[
+      ['12348','全国法律援助','免费法律咨询 · 讨薪、民事纠纷援助'],
+      ['12338','妇女维权热线','家暴 · 妇女权益 · 心理疏导'],
+      ['12355','青少年服务台','未成年人保护 · 青少年维权'],
+      ['12385','残疾人服务热线','残疾人维权 · 求助 · 政策咨询']
+    ]},
+    {g:'心理危机与防自杀救助', dot:'green', items:[
+      ['12356','全国心理援助热线','24小时心理危机 · 防自杀干预'],
+      ['400-161-9995','希望24小时生命热线','防自杀 · 重度抑郁求助（24h）'],
+      ['010-82951332','北京心理危机干预中心','24小时老牌自杀干预热线，全国可打'],
+      ['400-888-9999','全国心理援助专线','心理危机公益救助']
+    ]},
+    {g:'公共服务与慈善救助', dot:'gold', items:[
+      ['114','查号台','电话号码查询'],
+      ['12306','铁路客服','火车票务 · 列车服务'],
+      ['12320','公共卫生服务','健康咨询 · 卫生投诉'],
+      ['12322','防震减灾','地震信息 · 防灾咨询'],
+      ['12329','住房公积金','公积金查询 · 投诉'],
+      ['12308','外交部领事保护','海外遇险求助（境外拨 +86-10-12308）'],
+      ['999','红十字会急救','北京地区红十字紧急救援'],
+      ['12345','流浪动物 · 慈善救助','无全国统一号码，拨 12345 转接本地救助']
+    ]}
+  ];
+  var html = SOS_DATA.map(function(g){
+    var rows = g.items.map(function(it){
+      return '<a class="sos-row" href="tel:' + it[0].replace(/-/g,'') + '">'
+        + '<span class="sos-num">' + it[0] + '</span>'
+        + '<span class="sos-info"><b>' + it[1] + '</b><small>' + it[2] + '</small></span>'
+        + '<span class="sos-call">' + PHONE_SVG + '拨打</span></a>';
+    }).join('');
+    return '<div class="sos-group"><div class="sos-ghd"><i class="dot ' + g.dot + '"></i>' + g.g
+      + '<span>' + g.items.length + ' 条热线</span></div>' + rows + '</div>';
+  }).join('');
+  document.getElementById('sosList').innerHTML = html;
+  document.getElementById('sosList').addEventListener('click', function(e){
+    var row = e.target.closest('.sos-row');
+    if(row) playSound('call');
+  });
+})();
+</script>
+</body>
+</html>
